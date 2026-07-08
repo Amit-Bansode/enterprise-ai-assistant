@@ -12,15 +12,114 @@ An AI-first enterprise assistant where employees interact through natural langua
 - UI: React Native Paper + Vector Icons
 - Animation: Reanimated (installed, ready when needed)
 
+## Architecture
+
+```
++------------------------+
+|    Presentation        |
+|  screens, components   |
+|  navigation, theme     |
++------------------------+
+            │
++------------------------+
+|   AI Orchestrator      |
+|  processMessage.ts     |
+|  chatOrchestrator.ts   |
+|  chatStore.ts          |
++------------------------+
+            │
++------------------------+
+| Intent → Action        |
+| Retrieval → Provider   |
+| Parser → Factory       |
++------------------------+
+            │
++------------------------+
+| Data Sources           |
+| mock / local / remote  |
++------------------------+
+```
+
+### Layer responsibilities
+
+| Layer | Location | Role |
+|-------|----------|------|
+| **Presentation** | `src/presentation/` | Screens, GenUI cards, navigation, theme. Consumes built components from the orchestrator via Zustand. |
+| **AI Orchestrator** | `src/application/orchestrator/` | Coordinates the full message pipeline and bridges results to the UI store. |
+| **Intent → Action** | `src/application/intents/`, `src/application/actions/` | Detect intent and route to enterprise actions (leave, brief, knowledge search, resume work). |
+| **Retrieval → Provider** | `src/application/retrieval/`, `src/application/provider/` | Fetch knowledge when needed, then call the LLM provider for a structured response. |
+| **Parser → Factory** | `src/application/parser/`, `src/application/factory/` | Parser extracts semantic descriptors from LLM JSON; factory decides which React card components to build. |
+| **Data Sources** | `src/data/`, `src/domain/` | Repository pattern over mock, local (MMKV), and remote (Axios) datasources. |
+
+### Message processing pipeline
+
+```
+User Message
+      │
+      ▼
+Intent Router          detectIntent()
+      │
+      ▼
+Action                 executeAction()
+      │
+      ▼
+Knowledge Retriever    retrieveKnowledge()  (optional)
+      │
+      ▼
+LLM Provider           generateAIResponse() → { message, descriptors }
+      │
+      ▼
+Parser                 parseResponse()      → ComponentDescriptor[]
+      │
+      ▼
+Component Factory      buildComponents()    → BuiltComponent[]
+      │
+      ▼
+React Components       GenUIRenderer        → ActionCard | InfoCard | BriefCard
+```
+
+**Parser vs factory:** the parser only extracts semantic data from LLM output. The factory owns all UI decisions — which card type to render and with what props.
+
 ## Project structure
 
 ```
 src/
-  presentation/     screens, components, navigation, theme
-  application/      orchestrator, intents, actions, retrieval, provider, parser, factory
-  domain/           entities, repository interfaces
-  data/             mock/local/remote datasources + repository impl
-  core/             config, constants, storage, network, utils
+  presentation/
+    screens/
+    components/
+      cards/          ActionCard, InfoCard, BriefCard
+      chat/           GenUIRenderer, ChatInput, MessageBubble
+    navigation/
+    theme/
+
+  application/
+    orchestrator/     processMessage, chatOrchestrator, chatStore
+    intents/          detectIntent
+    actions/          actionEngine, applyLeave, generateMorningBrief, ...
+    retrieval/        retrieveKnowledge
+    provider/         generateAIResponse (LLM boundary)
+    parser/           parseResponse
+    factory/          buildComponents
+    usecases/
+
+  domain/
+    entities/
+    repository/
+
+  data/
+    datasource/
+      mock/
+      local/
+      remote/
+    repository/
+
+  core/
+    config/
+    constants/
+    storage/
+    network/
+    utils/
+
   assets/
 ```
 
@@ -50,22 +149,16 @@ npm start
 npm run ios    # or npm run android
 ```
 
-## Architecture notes
+## Configuration
 
-Message processing pipeline:
+Set `useMockData: false` and update `apiBaseUrl` in `src/core/config/appConfig.ts` when your backend is available.
 
-```
-User Message → Intent Router → Action → Knowledge Retriever (optional)
-  → LLM Provider → Parser → Component Descriptors
-  → Component Factory → React Components
-```
+## Key entry points
 
-- `application/orchestrator/processMessage.ts` runs the full GenUI pipeline.
-- `application/provider/generateResponse.ts` is the LLM boundary and returns structured JSON.
-- `application/parser/parseResponse.ts` only extracts `message` + semantic `descriptors` from LLM output.
-- `application/factory/componentFactory.ts` maps descriptor kinds to concrete card components.
-- `presentation/components/chat/GenUIRenderer.tsx` renders factory-built components.
-- `data/repository` switches between mock and remote sources via `src/core/config/appConfig.ts`.
-- `presentation` stays thin: screens consume Zustand store and render Paper components.
-
-Set `useMockData: false` and update `apiBaseUrl` when your backend is available.
+| File | Purpose |
+|------|---------|
+| `src/application/orchestrator/processMessage.ts` | Full GenUI pipeline |
+| `src/application/provider/generateResponse.ts` | LLM boundary (mock structured JSON today) |
+| `src/application/parser/parseResponse.ts` | Extract descriptors from LLM output |
+| `src/application/factory/componentFactory.ts` | Map descriptors → card components |
+| `src/presentation/components/chat/GenUIRenderer.tsx` | Render factory output |
