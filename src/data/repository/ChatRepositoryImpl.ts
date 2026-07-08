@@ -3,6 +3,7 @@ import { LocalChatDataSource } from '@/data/datasource/local/localChatDataSource
 import { MockChatDataSource } from '@/data/datasource/mock/mockChatDataSource';
 import type { Message } from '@/domain/entities/Message';
 import type { ChatRepository } from '@/domain/repository/ChatRepository';
+import { createId } from '@/core/utils/id';
 
 export class ChatRepositoryImpl implements ChatRepository {
   private readonly mockDataSource = new MockChatDataSource();
@@ -22,32 +23,36 @@ export class ChatRepositoryImpl implements ChatRepository {
     return messages;
   }
 
-  async sendMessage(content: string): Promise<Message> {
+  async appendTurn(
+    userContent: string,
+    assistantContent: string,
+  ): Promise<Message[]> {
     const existing = await this.getMessages();
-    const assistantMessage = appConfig.useMockData
-      ? await this.mockDataSource.sendMessage(content)
-      : {
-          id: `assistant_${Date.now()}`,
-          role: 'assistant' as const,
-          content: 'Remote chat API is not configured yet.',
-          createdAt: new Date().toISOString(),
-        };
+    const now = new Date().toISOString();
 
-    const updated = appConfig.useMockData
-      ? await this.mockDataSource.getMessages()
-      : [
-          ...existing,
-          {
-            id: `user_${Date.now()}`,
-            role: 'user' as const,
-            content,
-            createdAt: new Date().toISOString(),
-          },
-          assistantMessage,
-        ];
+    const updated: Message[] = [
+      ...existing,
+      {
+        id: createId('user'),
+        role: 'user',
+        content: userContent,
+        createdAt: now,
+      },
+      {
+        id: createId('assistant'),
+        role: 'assistant',
+        content: assistantContent,
+        createdAt: now,
+      },
+    ];
 
     await this.localDataSource.saveMessages(updated);
-    return assistantMessage;
+
+    if (appConfig.useMockData) {
+      await this.mockDataSource.setMessages(updated);
+    }
+
+    return updated;
   }
 
   async clearMessages(): Promise<void> {

@@ -17,7 +17,7 @@ An AI-first enterprise assistant where employees interact through natural langua
 ```
 src/
   presentation/     screens, components, navigation, theme
-  application/      orchestrator, intents, parser, factory, usecases
+  application/      orchestrator, intents, actions, retrieval, provider, parser, factory
   domain/           entities, repository interfaces
   data/             mock/local/remote datasources + repository impl
   core/             config, constants, storage, network, utils
@@ -52,7 +52,19 @@ npm run ios    # or npm run android
 
 ## Architecture notes
 
-- `application/orchestrator` coordinates intent parsing, use cases, and GenUI factory output.
+Message processing pipeline:
+
+```
+User Message → Intent Router → Action → Knowledge Retriever (optional)
+  → LLM Provider → Parser → Component Descriptors
+  → Component Factory → React Components
+```
+
+- `application/orchestrator/processMessage.ts` runs the full GenUI pipeline.
+- `application/provider/generateResponse.ts` is the LLM boundary and returns structured JSON.
+- `application/parser/parseResponse.ts` only extracts `message` + semantic `descriptors` from LLM output.
+- `application/factory/componentFactory.ts` maps descriptor kinds to concrete card components.
+- `presentation/components/chat/GenUIRenderer.tsx` renders factory-built components.
 - `data/repository` switches between mock and remote sources via `src/core/config/appConfig.ts`.
 - `presentation` stays thin: screens consume Zustand store and render Paper components.
 

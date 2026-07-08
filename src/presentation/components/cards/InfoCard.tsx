@@ -1,33 +1,19 @@
 import { StyleSheet } from 'react-native';
-import { Button, Card, Text } from 'react-native-paper';
+import { Card, Text } from 'react-native-paper';
 
 import type { GenUIComponentProps } from '@/application/factory/types';
 
-interface ActionCardProps extends GenUIComponentProps {
-  onPress?: () => void;
-}
+interface InfoCardProps extends GenUIComponentProps {}
 
-export function ActionCard({
-  title,
-  description,
-  actionLabel,
-  onPress,
-}: ActionCardProps) {
+export function InfoCard({ title, description }: InfoCardProps) {
   return (
-    <Card style={styles.card} mode="elevated">
+    <Card style={styles.card} mode="outlined">
       <Card.Content>
         <Text variant="titleMedium">{title}</Text>
         <Text variant="bodyMedium" style={styles.description}>
           {description}
         </Text>
       </Card.Content>
-      {actionLabel ? (
-        <Card.Actions>
-          <Button mode="contained-tonal" onPress={onPress}>
-            {actionLabel}
-          </Button>
-        </Card.Actions>
-      ) : null}
     </Card>
   );
 }

@@ -18,25 +18,8 @@ export class MockChatDataSource {
     return [...this.messages];
   }
 
-  async sendMessage(content: string): Promise<Message> {
-    const userMessage: Message = {
-      id: createId('user'),
-      role: 'user',
-      content,
-      createdAt: new Date().toISOString(),
-    };
-
-    this.messages.push(userMessage);
-
-    const assistantMessage: Message = {
-      id: createId('assistant'),
-      role: 'assistant',
-      content: `I received: "${content}". Connect a remote datasource when your backend is ready.`,
-      createdAt: new Date().toISOString(),
-    };
-
-    this.messages.push(assistantMessage);
-    return assistantMessage;
+  async setMessages(messages: Message[]): Promise<void> {
+    this.messages = [...messages];
   }
 
   async clearMessages(): Promise<void> {

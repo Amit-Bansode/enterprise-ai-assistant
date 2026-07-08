@@ -5,7 +5,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { useChatStore } from '@/application/orchestrator/chatStore';
 import { Routes } from '@/core/constants/routes';
-import { ActionCard } from '@/presentation/components/cards/ActionCard';
+import { GenUIRenderer } from '@/presentation/components/chat/GenUIRenderer';
 import { ChatInput } from '@/presentation/components/chat/ChatInput';
 import { MessageBubble } from '@/presentation/components/chat/MessageBubble';
 import { ScreenContainer } from '@/presentation/components/common/ScreenContainer';
@@ -16,7 +16,7 @@ type Props = NativeStackScreenProps<RootStackParamList, typeof Routes.Chat>;
 export function ChatScreen({ navigation }: Props) {
   const {
     messages,
-    activeGenUI,
+    components,
     isLoading,
     error,
     loadMessages,
@@ -48,7 +48,7 @@ export function ChatScreen({ navigation }: Props) {
         renderItem={({ item }) => <MessageBubble message={item} />}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
-          activeGenUI ? <ActionCard descriptor={activeGenUI} /> : null
+          components.length > 0 ? <GenUIRenderer components={components} /> : null
         }
         ListFooterComponent={
           isLoading ? (

@@ -1,23 +1,24 @@
-import { createGenUIComponent } from '@/application/factory/genUIComponentFactory';
-import { parseIntent } from '@/application/parser/intentParser';
+import { processMessage } from '@/application/orchestrator/processMessage';
 import {
+  AppendChatTurnUseCase,
   ClearChatUseCase,
   LoadMessagesUseCase,
-  SendMessageUseCase,
 } from '@/application/usecases/chatUseCases';
+import type { UIComponent } from '@/application/factory/types';
+import type { DetectedIntent } from '@/application/intents/types';
 import { ChatRepositoryImpl } from '@/data/repository/ChatRepositoryImpl';
-import type { GenUIComponentDescriptor } from '@/application/factory/genUIComponentFactory';
 import type { Message } from '@/domain/entities/Message';
 
 const chatRepository = new ChatRepositoryImpl();
 
 const loadMessagesUseCase = new LoadMessagesUseCase(chatRepository);
-const sendMessageUseCase = new SendMessageUseCase(chatRepository);
+const appendChatTurnUseCase = new AppendChatTurnUseCase(chatRepository);
 const clearChatUseCase = new ClearChatUseCase(chatRepository);
 
 export interface ChatTurnResult {
-  message: Message;
-  genUI: GenUIComponentDescriptor | null;
+  messages: Message[];
+  components: UIComponent[];
+  intent: DetectedIntent;
 }
 
 export const chatOrchestrator = {
@@ -26,11 +27,17 @@ export const chatOrchestrator = {
   },
 
   async sendMessage(content: string): Promise<ChatTurnResult> {
-    const parsedIntent = parseIntent(content);
-    const message = await sendMessageUseCase.execute(content);
-    const genUI = createGenUIComponent(parsedIntent);
+    const processed = await processMessage(content);
+    const messages = await appendChatTurnUseCase.execute(
+      content,
+      processed.assistantMessage,
+    );
 
-    return { message, genUI };
+    return {
+      messages,
+      components: processed.components,
+      intent: processed.intent,
+    };
   },
 
   clearMessages(): Promise<void> {

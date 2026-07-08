@@ -1,12 +1,12 @@
 import { create } from 'zustand';
 
 import { chatOrchestrator } from '@/application/orchestrator/chatOrchestrator';
-import type { GenUIComponentDescriptor } from '@/application/factory/genUIComponentFactory';
+import type { UIComponent } from '@/application/factory/types';
 import type { Message } from '@/domain/entities/Message';
 
 interface ChatState {
   messages: Message[];
-  activeGenUI: GenUIComponentDescriptor | null;
+  components: UIComponent[];
   isLoading: boolean;
   error: string | null;
   loadMessages: () => Promise<void>;
@@ -16,7 +16,7 @@ interface ChatState {
 
 export const useChatStore = create<ChatState>((set) => ({
   messages: [],
-  activeGenUI: null,
+  components: [],
   isLoading: false,
   error: null,
 
@@ -41,11 +41,10 @@ export const useChatStore = create<ChatState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const turn = await chatOrchestrator.sendMessage(content);
-      const messages = await chatOrchestrator.loadMessages();
 
       set({
-        messages,
-        activeGenUI: turn.genUI,
+        messages: turn.messages,
+        components: turn.components,
         isLoading: false,
       });
     } catch (error) {
@@ -60,7 +59,7 @@ export const useChatStore = create<ChatState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       await chatOrchestrator.clearMessages();
-      set({ messages: [], activeGenUI: null, isLoading: false });
+      set({ messages: [], components: [], isLoading: false });
     } catch (error) {
       set({
         isLoading: false,
