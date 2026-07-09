@@ -2,10 +2,6 @@
 
 Enterprise AI Assistant is an AI-first React Native prototype demonstrating an intent-driven orchestration pipeline, retrieval-augmented knowledge access, and dynamic GenUI rendering using a layered architecture.
 
-![Gemini extraction — intent + entities from natural language](docs/screenshots/gemini-extraction.png)
-
-*Natural language in → Gemini extracts structured JSON → deterministic business logic → GenUI card rendered in chat. DevTools shows the extraction prompt hitting `gemini-2.5-flash:generateContent`.*
-
 ## Stack
 
 - React Native CLI + TypeScript
@@ -76,7 +72,20 @@ Gemini Phrasing
 Presentation
 ```
 
-Gemini is used **exactly twice** per user message — once for intent + entity extraction, once for friendly response phrasing. Everything else (actions, card descriptors, factory, workflow buttons) stays deterministic.
+![Gemini extraction — intent + entities from natural language](docs/screenshots/gemini-extraction.png)
+
+![Gemini phrasing — friendly assistant response](docs/screenshots/gemini-phrasing.png)
+
+*Natural language in → Gemini extracts structured JSON → deterministic business logic → GenUI card rendered in chat. DevTools shows both Gemini calls hitting `gemini-2.5-flash:generateContent` — extraction (intent + entities) and phrasing (friendly chat bubble). Card data (`workflow_draft`) is built deterministically from extracted entities.*
+
+**Example:** `Apply leave on 25th July, its my son's birthday`
+
+1. **Extraction** → `{ intent: "apply_leave", entities: { date, reason, duration, leaveType } }`
+2. **Action** → `applyLeave(entities)` saves draft to MMKV
+3. **Factory** → `LeaveDraftCard` with Submit / Modify / Cancel
+4. **Phrasing** → *"Got it! Your leave request for July 25..."*
+
+Gemini is used **exactly twice** per user message — once for intent + entity extraction, once for friendly response phrasing. Everything else (actions, card descriptors, factory, workflow buttons) stays deterministic. Workflow button clicks (`Submit`, `Modify`, `Cancel`) bypass Gemini and use deterministic keyword detection.
 
 | Step | Location | Entry point |
 |------|----------|-------------|
@@ -92,21 +101,6 @@ Gemini is used **exactly twice** per user message — once for intent + entity e
 | GenUI Renderer | `src/presentation/components/chat/` | `GenUIRenderer.tsx` |
 
 The AI orchestration layer (`processMessage.ts`) wires the pipeline together. The parser extracts semantic descriptors from LLM output; the factory decides which React Native card components to build.
-
-### Gemini in action
-
-![Gemini phrasing — friendly assistant response](docs/screenshots/gemini-phrasing.png)
-
-*Second Gemini call phrases the chat bubble. Card data (`workflow_draft`) is built deterministically from extracted entities — no regex, no SDK.*
-
-**Example:** `Apply leave on 25th July, its my son's birthday`
-
-1. **Extraction** → `{ intent: "apply_leave", entities: { date, reason, duration, leaveType } }`
-2. **Action** → `applyLeave(entities)` saves draft to MMKV
-3. **Factory** → `LeaveDraftCard` with Submit / Modify / Cancel
-4. **Phrasing** → *"Got it! Your leave request for July 25..."*
-
-Workflow button clicks (`Submit`, `Modify`, `Cancel`) bypass Gemini and use deterministic keyword detection.
 
 ## Design Principles
 
