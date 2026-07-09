@@ -1,5 +1,10 @@
 import type { ModifyField } from '@/application/actions/leaveModifyGuidance';
-import { formatDateDisplay, normalizeDuration } from '@/core/utils/date';
+import {
+  formatDateDisplayFromParts,
+  normalizeDuration,
+  toIsoDateFromLocalDate,
+  toIsoDateString,
+} from '@/core/utils/date';
 
 const MONTHS: Record<string, number> = {
   january: 0,
@@ -45,8 +50,8 @@ function parseDateFromText(text: string): { iso: string; display: string } | nul
     const day = Number(dayMonthYear[1]);
     const month = MONTHS[dayMonthYear[2].toLowerCase()];
     const year = dayMonthYear[3] ? Number(dayMonthYear[3]) : 2026;
-    const iso = new Date(year, month, day).toISOString().slice(0, 10);
-    return { iso, display: formatDateDisplay(iso) };
+    const iso = toIsoDateString(year, month, day);
+    return { iso, display: formatDateDisplayFromParts(year, month, day) };
   }
 
   const monthDay = text.match(
@@ -57,16 +62,23 @@ function parseDateFromText(text: string): { iso: string; display: string } | nul
     const month = MONTHS[monthDay[1].toLowerCase()];
     const day = Number(monthDay[2]);
     const year = monthDay[3] ? Number(monthDay[3]) : 2026;
-    const iso = new Date(year, month, day).toISOString().slice(0, 10);
-    return { iso, display: formatDateDisplay(iso) };
+    const iso = toIsoDateString(year, month, day);
+    return { iso, display: formatDateDisplayFromParts(year, month, day) };
   }
 
   const normalized = text.toLowerCase();
   if (normalized.includes('tomorrow')) {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const iso = tomorrow.toISOString().slice(0, 10);
-    return { iso, display: formatDateDisplay(iso) };
+    const iso = toIsoDateFromLocalDate(tomorrow);
+    return {
+      iso,
+      display: formatDateDisplayFromParts(
+        tomorrow.getFullYear(),
+        tomorrow.getMonth(),
+        tomorrow.getDate(),
+      ),
+    };
   }
 
   return null;

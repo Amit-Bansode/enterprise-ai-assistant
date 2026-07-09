@@ -21,8 +21,8 @@ export const QUICK_ACTIONS: QuickAction[] = [
     prompt: 'Resume my last workflow',
   },
   {
-    id: 'meetings',
-    label: "📅 Today's Meetings",
+    id: 'briefing',
+    label: "🌅 Today's Briefing",
     prompt: 'Show my morning brief',
   },
 ];

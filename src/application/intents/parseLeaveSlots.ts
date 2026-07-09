@@ -1,3 +1,5 @@
+import { formatDateDisplayFromParts, toIsoDateFromLocalDate } from '@/core/utils/date';
+
 const MONTHS: Record<string, number> = {
   january: 0,
   february: 1,
@@ -12,14 +14,6 @@ const MONTHS: Record<string, number> = {
   november: 10,
   december: 11,
 };
-
-function formatDisplayDate(date: Date): string {
-  return date.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 function parseExplicitDate(text: string): Date | null {
   const match = text.match(
@@ -77,8 +71,12 @@ export function parseLeaveSlots(text: string): LeaveSlots {
   const reason = parseReason(text);
 
   return {
-    date: parsedDate.toISOString().slice(0, 10),
-    dateDisplay: formatDisplayDate(parsedDate),
+    date: toIsoDateFromLocalDate(parsedDate),
+    dateDisplay: formatDateDisplayFromParts(
+      parsedDate.getFullYear(),
+      parsedDate.getMonth(),
+      parsedDate.getDate(),
+    ),
     reason,
   };
 }
