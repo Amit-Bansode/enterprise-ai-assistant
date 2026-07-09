@@ -53,6 +53,8 @@ Rules:
 - Use ISO date format YYYY-MM-DD for entities.date when a date is mentioned.
 - Leave empty strings for unknown entity fields.
 - Infer intent from meaning, not only keywords.
+- Questions about policies, rules, or guidelines (e.g. "what is the leave policy", "can I carry forward leave") must use knowledge_search, NOT apply_leave.
+- apply_leave is only when the user wants to request or book time off.
 - When conversation context shows an active leave draft and the user wants to change details, use modify_leave.
 ${contextBlock}
 User: ${userMessage}`;

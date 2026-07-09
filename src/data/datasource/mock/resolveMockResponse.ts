@@ -26,9 +26,10 @@ const descriptorCatalog: Partial<
   meeting: {
     id: 'meetings',
     kind: 'meeting',
-    title: 'Meetings',
+    title: 'Meetings (2)',
     body: 'Your schedule for today',
     data: {
+      count: 2,
       items: [
         { time: '10:30', title: 'Design Review' },
         { time: '2:00', title: 'Sprint Planning' },
@@ -36,12 +37,13 @@ const descriptorCatalog: Partial<
     },
   },
   task: {
-    id: 'tasks',
+    id: 'approvals',
     kind: 'task',
-    title: 'Pending Tasks',
+    title: 'Pending Approvals (2)',
     body: '2 approvals waiting',
     data: {
       pendingCount: 2,
+      items: [{ title: 'Leave Approval' }, { title: 'Expense Approval' }],
     },
   },
   learning: {
@@ -54,6 +56,13 @@ const descriptorCatalog: Partial<
       progress: 62,
     },
   },
+  ai_suggestion: {
+    id: 'ai_suggestion',
+    kind: 'ai_suggestion',
+    title: 'AI Suggestion',
+    body: '"You have a free 30-minute slot at 4 PM. Continue your React Native learning?"',
+    data: {},
+  },
   workflow_draft: {
     id: 'workflow_draft',
     kind: 'workflow_draft',
@@ -64,9 +73,18 @@ const descriptorCatalog: Partial<
   knowledge_item: {
     id: 'knowledge_item',
     kind: 'knowledge_item',
-    title: 'Leave Policy 2026',
-    body: 'Annual leave requests require manager approval at least 3 days in advance.',
-    data: { source: 'HR Handbook' },
+    title: 'Leave Policy',
+    body: 'Annual Leave',
+    data: {
+      subtitle: 'Annual Leave',
+      bullets: [
+        '18 days/year',
+        'Carry forward allowed (up to 5 days)',
+        'Manager approval required',
+      ],
+      source: 'HR Policy v2.1',
+      updatedAt: 'Jan 2026',
+    },
   },
   workflow_resume: {
     id: 'workflow_resume',

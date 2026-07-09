@@ -8,12 +8,6 @@ import type { CardAccent } from '@/presentation/theme/cardAccents';
 
 type DescriptorBuilder = (descriptor: UIComponentDescriptor) => UIComponent | null;
 
-const WORKFLOW_COMPONENTS = new Set([
-  'LeaveDraftCard',
-  'SuccessCard',
-  'StatusCard',
-]);
-
 const accentByKind: Partial<Record<UIComponentDescriptor['kind'], CardAccent>> = {
   daily_summary: 'primary',
   meeting: 'blue',
@@ -70,6 +64,16 @@ const descriptorBuilders: Partial<
       metadata: descriptor.data,
     },
   }),
+  ai_suggestion: descriptor => ({
+    id: descriptor.id,
+    component: 'AISuggestionCard',
+    props: {
+      title: descriptor.title,
+      description: descriptor.body,
+      accent: accentByKind.daily_summary,
+      metadata: descriptor.data,
+    },
+  }),
   workflow_draft: descriptor => ({
     id: descriptor.id,
     component: 'LeaveDraftCard',
@@ -102,7 +106,7 @@ const descriptorBuilders: Partial<
   }),
   knowledge_item: descriptor => ({
     id: descriptor.id,
-    component: 'LearningCard',
+    component: 'PolicyCard',
     props: {
       title: descriptor.title,
       description: descriptor.body,
@@ -133,38 +137,13 @@ const descriptorBuilders: Partial<
   }),
 };
 
-function createNextStepsComponent(): UIComponent {
-  return {
-    id: 'next_steps',
-    component: 'NextStepsCard',
-    props: {
-      title: NEXT_STEPS_PROMPT,
-      description: '',
-      metadata: {
-        actions: [...NEXT_STEPS_ACTIONS],
-      },
-    },
-  };
-}
-
 export function buildComponents(
   descriptors: UIComponentDescriptor[],
 ): UIComponent[] {
-  const built = descriptors
+  return descriptors
     .map(descriptor => {
       const builder = descriptorBuilders[descriptor.kind];
       return builder ? builder(descriptor) : null;
     })
-    .filter((component): component is UIComponent => component !== null)
-    .filter(component => component.component !== 'NextStepsCard');
-
-  const hasWorkflowCard = built.some(component =>
-    WORKFLOW_COMPONENTS.has(component.component),
-  );
-
-  if (hasWorkflowCard) {
-    return built;
-  }
-
-  return [...built, createNextStepsComponent()];
+    .filter((component): component is UIComponent => component !== null);
 }

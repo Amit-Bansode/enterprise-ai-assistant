@@ -5,6 +5,8 @@ export type GenUIComponentType =
   | 'MeetingCard'
   | 'TaskCard'
   | 'LearningCard'
+  | 'AISuggestionCard'
+  | 'PolicyCard'
   | 'LeaveDraftCard'
   | 'SuccessCard'
   | 'StatusCard'

@@ -3,6 +3,7 @@ export type ComponentDescriptorKind =
   | 'meeting'
   | 'task'
   | 'learning'
+  | 'ai_suggestion'
   | 'workflow_draft'
   | 'workflow_success'
   | 'workflow_status'

@@ -9,19 +9,37 @@ interface IntentPattern {
 
 const intentPatterns: IntentPattern[] = [
   {
+    intent: 'knowledge_search',
+    confidence: 0.8,
+    keywords: [
+      'policy',
+      'document',
+      'search',
+      'handbook',
+      'guideline',
+      'carry forward',
+      'reimbursement',
+      'travel policy',
+      'leave policy',
+    ],
+  },
+  {
     intent: 'apply_leave',
     confidence: 0.75,
-    keywords: ['leave', 'pto', 'vacation', 'time off', 'day off'],
+    keywords: [
+      'apply leave',
+      'apply for leave',
+      'pto',
+      'vacation',
+      'time off',
+      'day off',
+      'need a day off',
+    ],
   },
   {
     intent: 'daily_brief',
     confidence: 0.75,
-    keywords: ['brief', 'standup', 'meetings', 'today'],
-  },
-  {
-    intent: 'knowledge_search',
-    confidence: 0.75,
-    keywords: ['policy', 'document', 'search', 'handbook', 'guideline'],
+    keywords: ['brief', 'standup', 'meetings', 'today', 'morning brief'],
   },
   {
     intent: 'resume_work',

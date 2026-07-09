@@ -21,9 +21,12 @@ export async function processMessage(userMessage: string): Promise<ProcessMessag
     intent,
   });
 
-  await retrieveKnowledge(userMessage, actionResult);
+  const knowledgeResult = await retrieveKnowledge(userMessage, actionResult);
 
-  const aiResponse = await generateResponse(intent.intent, actionResult);
+  const aiResponse = await generateResponse(intent.intent, actionResult, {
+    userMessage,
+    knowledgeResult,
+  });
 
   const parsed = parseResponse(aiResponse);
   const components = buildComponents(parsed.descriptors);

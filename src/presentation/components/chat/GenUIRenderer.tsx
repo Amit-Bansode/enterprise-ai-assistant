@@ -1,9 +1,11 @@
 import type { UIComponent } from '@/application/factory/types';
+import { AISuggestionCard } from '@/presentation/components/cards/AISuggestionCard';
 import { BriefCard } from '@/presentation/components/cards/BriefCard';
 import { LearningCard } from '@/presentation/components/cards/LearningCard';
 import { LeaveDraftCard } from '@/presentation/components/cards/LeaveDraftCard';
 import { MeetingCard } from '@/presentation/components/cards/MeetingCard';
 import { NextStepsCard } from '@/presentation/components/cards/NextStepsCard';
+import { PolicyCard } from '@/presentation/components/cards/PolicyCard';
 import { StatusCard } from '@/presentation/components/cards/StatusCard';
 import { SuccessCard } from '@/presentation/components/cards/SuccessCard';
 import { TaskCard } from '@/presentation/components/cards/TaskCard';
@@ -46,6 +48,16 @@ export function GenUIRenderer({ components, onAction }: GenUIRendererProps) {
             return <TaskCard key={component.id} {...component.props} />;
           case 'LearningCard':
             return <LearningCard key={component.id} {...component.props} />;
+          case 'AISuggestionCard':
+            return <AISuggestionCard key={component.id} {...component.props} />;
+          case 'PolicyCard':
+            return (
+              <PolicyCard
+                key={component.id}
+                {...component.props}
+                onAction={onAction}
+              />
+            );
           case 'LeaveDraftCard':
             return (
               <LeaveDraftCard

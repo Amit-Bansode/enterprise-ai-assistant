@@ -1,3 +1,4 @@
+import { detectKnowledgeQuery } from '@/application/intents/detectKnowledgeQuery';
 import type { DetectedIntent } from '@/application/intents/types';
 import { detectWorkflowAction } from '@/application/intents/detectWorkflowAction';
 import { detectIntentFallback } from '@/application/intents/detectIntentFallback';
@@ -17,12 +18,17 @@ export async function resolveIntent(userMessage: string): Promise<DetectedIntent
     return workflowIntent;
   }
 
+  const knowledgeIntent = detectKnowledgeQuery(userMessage);
+  if (knowledgeIntent) {
+    return knowledgeIntent;
+  }
+
   if (isGeminiConfigured()) {
     const geminiIntent = await extractIntentWithGemini(userMessage, conversationContext);
     if (
       geminiIntent &&
       geminiIntent.intent !== 'unknown' &&
-      shouldUseGeminiExtraction(geminiIntent.intent)
+      shouldUseGeminiExtraction(geminiIntent.intent, userMessage)
     ) {
       return geminiIntent;
     }

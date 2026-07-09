@@ -1,4 +1,5 @@
 import type { DetectedIntent, UserIntent } from '@/application/intents/types';
+import { isPolicyQuestion } from '@/application/intents/detectKnowledgeQuery';
 import { geminiProvider, isGeminiConfigured } from '@/application/provider/GeminiProvider';
 import { buildExtractionPrompt } from '@/application/provider/prompts/extractionPrompt';
 import { parseModelJson, toValidIntent } from '@/application/provider/parseModelJson';
@@ -60,6 +61,10 @@ export async function extractIntentWithGemini(
   }
 }
 
-export function shouldUseGeminiExtraction(intent: UserIntent): boolean {
+export function shouldUseGeminiExtraction(intent: UserIntent, userMessage?: string): boolean {
+  if (userMessage && isPolicyQuestion(userMessage)) {
+    return false;
+  }
+
   return !['submit_leave', 'cancel_leave', 'daily_brief'].includes(intent);
 }

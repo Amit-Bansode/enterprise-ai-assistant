@@ -23,11 +23,16 @@ export function LearningCard({
         {description}
       </Text>
       {progress !== undefined ? (
-        <ProgressBar
-          progress={progress}
-          color={accentColor}
-          style={styles.progress}
-        />
+        <>
+          <Text variant="labelMedium" style={styles.progressLabel}>
+            Progress: {Math.round(progress * 100)}%
+          </Text>
+          <ProgressBar
+            progress={progress}
+            color={accentColor}
+            style={styles.progress}
+          />
+        </>
       ) : null}
     </AccentCardShell>
   );
@@ -37,8 +42,12 @@ const styles = StyleSheet.create({
   description: {
     marginBottom: 4,
   },
+  progressLabel: {
+    marginTop: 8,
+    opacity: 0.7,
+  },
   progress: {
-    marginTop: 12,
+    marginTop: 8,
     borderRadius: 4,
     height: 6,
   },

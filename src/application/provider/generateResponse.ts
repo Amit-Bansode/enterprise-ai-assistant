@@ -1,7 +1,9 @@
 import type { ActionResult } from '@/application/actions/types';
 import type { AIResponse } from '@/application/provider/types';
 import type { UIComponentDescriptor } from '@/application/parser/types';
+import { explainPolicy } from '@/application/provider/explainPolicy';
 import { phraseResponse } from '@/application/provider/phraseResponse';
+import type { KnowledgeItem, KnowledgeResult } from '@/application/retrieval/types';
 import {
   LEAVE_DRAFT_PROMPTS,
   LEAVE_STATUS_PROMPTS,
@@ -32,6 +34,30 @@ function buildLeaveDraftDescriptor(draft: Record<string, unknown>): UIComponentD
         { label: 'Submit', prompt: LEAVE_DRAFT_PROMPTS.submit },
         { label: 'Modify', prompt: LEAVE_DRAFT_PROMPTS.modify },
         { label: 'Cancel', prompt: LEAVE_DRAFT_PROMPTS.cancel },
+      ],
+    },
+  };
+}
+
+function buildPolicyDescriptor(policy: KnowledgeItem): UIComponentDescriptor {
+  const policyLabel = policy.id === 'leave-policy' ? '📘 Leave Policy' : `📘 ${policy.title}`;
+
+  return {
+    id: policy.id,
+    kind: 'knowledge_item',
+    title: policyLabel,
+    body: policy.title,
+    data: {
+      subtitle: policy.title,
+      bullets: policy.bullets,
+      source: policy.source,
+      updatedAt: policy.updatedAt,
+      policyId: policy.id,
+      actions: [
+        {
+          label: 'View Full Policy',
+          prompt: `Show full ${policy.title} policy`,
+        },
       ],
     },
   };
@@ -75,12 +101,22 @@ export function generateMorningBriefResponse(): AIResponse {
   return toAIResponse(message, descriptors);
 }
 
+export interface GenerateResponseOptions {
+  userMessage?: string;
+  knowledgeResult?: KnowledgeResult | null;
+}
+
 export async function generateResponse(
   intent: UserIntent,
   actionResult: ActionResult,
+  options: GenerateResponseOptions = {},
 ): Promise<AIResponse> {
   if (intent === 'daily_brief') {
     return generateMorningBriefResponse();
+  }
+
+  if (intent === 'knowledge_search') {
+    return generateKnowledgeResponse(actionResult, options);
   }
 
   const fallbackMessage = actionResult.summary;
@@ -88,6 +124,24 @@ export async function generateResponse(
   const descriptors = buildDescriptors(intent, actionResult);
 
   return toAIResponse(message, descriptors);
+}
+
+async function generateKnowledgeResponse(
+  actionResult: ActionResult,
+  options: GenerateResponseOptions,
+): Promise<AIResponse> {
+  const policy = options.knowledgeResult?.items[0];
+  const query = options.userMessage ?? String(actionResult.payload.query ?? '');
+
+  if (!policy) {
+    return toAIResponse(
+      'I could not find a matching policy in the knowledge base. Try asking about leave, travel, or expenses.',
+      [],
+    );
+  }
+
+  const message = await explainPolicy(query, policy);
+  return toAIResponse(message, [buildPolicyDescriptor(policy)]);
 }
 
 function buildDescriptors(
@@ -116,10 +170,7 @@ function buildDescriptors(
       return [];
     }
     case 'knowledge_search':
-      return normalizeResponse({
-        message: actionResult.summary,
-        components: [{ kind: 'knowledge_item' }],
-      }).descriptors;
+      return [];
     case 'cancel_leave':
       return [];
     default:

@@ -5,7 +5,7 @@ export async function searchKnowledge(
 ): Promise<ActionResult> {
   return {
     actionId: 'knowledge_search',
-    summary: 'Searching enterprise knowledge for relevant documents.',
+    summary: 'Searching enterprise knowledge for relevant policies.',
     requiresKnowledge: true,
     payload: {
       query: context.userMessage,

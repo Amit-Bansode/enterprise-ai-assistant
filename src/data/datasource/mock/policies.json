@@ -1,0 +1,41 @@
+[
+  {
+    "id": "leave-policy",
+    "title": "Annual Leave",
+    "content": "Employees receive 18 days of annual leave per calendar year. Unused annual leave may be carried forward up to 5 days into the next year. All leave requests require manager approval at least 3 business days in advance. Emergency leave may be requested with same-day manager approval.",
+    "bullets": [
+      "18 days/year",
+      "Carry forward allowed (up to 5 days)",
+      "Manager approval required"
+    ],
+    "tags": ["leave", "annual", "vacation", "pto", "holiday", "carry", "forward", "approval"],
+    "source": "HR Policy v2.1",
+    "updatedAt": "Jan 2026"
+  },
+  {
+    "id": "travel-policy",
+    "title": "Business Travel",
+    "content": "Domestic business travel must be pre-approved by your manager. International travel requires director-level approval submitted at least 14 days in advance. Employees should book economy class unless the flight exceeds 6 hours. Per diem rates follow the company travel schedule.",
+    "bullets": [
+      "Manager pre-approval required",
+      "International travel: 14 days notice",
+      "Economy class standard"
+    ],
+    "tags": ["travel", "business", "trip", "flight", "international", "domestic"],
+    "source": "HR Policy v2.1",
+    "updatedAt": "Jan 2026"
+  },
+  {
+    "id": "expense-policy",
+    "title": "Expense Reimbursement",
+    "content": "Employees must submit expense claims within 30 days of incurring the cost. All claims require itemized receipts. Meals during business travel are reimbursed up to $75 per day. Personal expenses are not reimbursable. Finance reviews claims within 5 business days.",
+    "bullets": [
+      "Submit within 30 days",
+      "Receipts required",
+      "Meals up to $75/day on travel"
+    ],
+    "tags": ["expense", "reimbursement", "receipt", "finance", "claim", "meal"],
+    "source": "Finance Policy v1.4",
+    "updatedAt": "Dec 2025"
+  }
+]

@@ -13,7 +13,7 @@ export const QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'policy',
     label: '📘 Search Policy',
-    prompt: 'Search leave policy',
+    prompt: 'What is the leave policy?',
   },
   {
     id: 'resume',
