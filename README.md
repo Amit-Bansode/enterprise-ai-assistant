@@ -357,21 +357,40 @@ src/
 ```
 ## 📸 Screenshots
 
-| Morning Brief | Policy Search |
-|---------------|---------------|
-| <p align="center">
-  <img src="docs/screenshots/morning-brief.png" width="320" alt="Morning Brief"/>
-</p> | <p align="center">
-  <img src="docs/screenshots/policy-search.png" width="320" alt="Policy Search"/>
-</p> |
+<table>
+  <tr>
+    <td align="center">
+      <b>🌅 Morning Brief</b><br/><br/>
+      <img src="docs/screenshots/morning-brief.png" width="280" alt="Morning Brief"/>
+    </td>
+    <td align="center">
+      <b>📘 Policy Search</b><br/><br/>
+      <img src="docs/screenshots/policy-search.png" width="280" alt="Policy Search"/>
+    </td>
+  </tr>
 
-| Leave Draft | Modify Request |
-|--------------|----------------|
-| ![](docs/screenshots/leave-apply.png) | ![](docs/screenshots/leave-modify.png) |
+  <tr>
+    <td align="center">
+      <b>🌴 Apply Leave</b><br/><br/>
+      <img src="docs/screenshots/leave-apply.png" width="280" alt="Apply Leave"/>
+    </td>
+    <td align="center">
+      <b>✏️ Modify Leave</b><br/><br/>
+      <img src="docs/screenshots/leave-modify.png" width="280" alt="Modify Leave"/>
+    </td>
+  </tr>
 
-| Leave Submitted |
-|-----------------|
-| ![](docs/screenshots/leave-submit.png) |
+  <tr>
+    <td align="center">
+      <b>✅ Leave Submitted</b><br/><br/>
+      <img src="docs/screenshots/leave-submit.png" width="280" alt="Leave Submitted"/>
+    </td>
+    <td align="center">
+      <b>♻️ Resume Workflow</b><br/><br/>
+      <img src="docs/screenshots/resume-workflow.png" width="280" alt="Resume Workflow"/>
+    </td>
+  </tr>
+</table>
 
 ## Getting started
 
