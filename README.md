@@ -359,7 +359,11 @@ src/
 
 | Morning Brief | Policy Search |
 |---------------|---------------|
-| ![](docs/screenshots/morning-brief.png) | ![](docs/screenshots/policy-search.png) |
+| <p align="center">
+  <img src="docs/screenshots/morning-brief.png" width="320" alt="Morning Brief"/>
+</p> | <p align="center">
+  <img src="docs/screenshots/policy-search.png" width="320" alt="Policy Search"/>
+</p> |
 
 | Leave Draft | Modify Request |
 |--------------|----------------|
