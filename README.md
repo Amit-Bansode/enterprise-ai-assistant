@@ -1,6 +1,88 @@
+![React Native](https://img.shields.io/badge/React%20Native-0.86-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
+![Gemini AI](https://img.shields.io/badge/Google-Gemini%202.5%20Flash-green)
+![Architecture](https://img.shields.io/badge/Architecture-Layered-orange)
+![License](https://img.shields.io/badge/License-MIT-lightgrey)
+
 # Enterprise AI Assistant
 
-Enterprise AI Assistant is an AI-first React Native prototype demonstrating an intent-driven orchestration pipeline, retrieval-augmented knowledge access, and dynamic GenUI rendering using a layered architecture.
+An AI-powered Enterprise Assistant built with **React Native CLI**, **TypeScript**, and **Google Gemini** that demonstrates how Large Language Models can be combined with deterministic enterprise workflows using a layered architecture.
+
+Instead of allowing AI to control the application, the assistant treats the LLM as a Natural Language Understanding and Generation engine while business logic, workflow execution and UI rendering remain fully deterministic.
+
+## ✨ Features
+
+### 🤖 AI Capabilities
+
+- 🌅 AI-powered Morning Brief with meetings, approvals and learning recommendations
+- 🧠 Gemini-powered intent recognition and entity extraction
+- 💬 Natural language conversations with multi-turn context
+- 📘 Enterprise policy search using a Mini RAG architecture
+- ♻ Resume active workflows from previous sessions
+
+### 💼 Enterprise Workflows
+
+- 🌴 Apply Leave using natural language
+- ✏️ Modify leave requests conversationally
+- ✅ Submit leave requests with deterministic business actions
+- 📊 Workflow status and conversation memory using MMKV
+
+### 🏗 Engineering Highlights
+
+- Layered Clean Architecture
+- Intent-driven AI orchestration pipeline
+- Factory-based GenUI rendering
+- Semantic component descriptors
+- Swappable AI provider abstraction
+- Offline fallback when AI is unavailable
+
+  ## 🎥 Demo
+
+### Morning Brief
+
+Displays today's meetings, pending approvals, learning progress and AI-powered recommendations.
+
+### Enterprise Policy Search
+
+Ask questions naturally:
+
+> What is the leave policy?
+
+> Can I carry forward annual leave?
+
+The assistant retrieves relevant enterprise policies and generates contextual answers using Gemini.
+
+### Leave Workflow
+
+Natural conversation:
+
+```
+Apply leave on 25 July because it's my son's birthday.
+
+↓
+
+Leave Draft
+
+↓
+
+Sorry, change it to 26 July.
+
+↓
+
+Updated Draft
+
+↓
+
+Submit
+
+↓
+
+Success
+```
+
+### Resume Workflow
+
+The assistant remembers unfinished work using MMKV conversation context and resumes it after reopening the application.
 
 ## Stack
 
@@ -83,7 +165,27 @@ Gemini Phrasing
 ▼
 Presentation
 ```
+## 🧠 AI Design Philosophy
 
+Unlike traditional AI chat applications, the Large Language Model does **not** control application behavior.
+
+Gemini is intentionally responsible only for:
+
+- Intent Recognition
+- Entity Extraction
+- Natural Language Responses
+
+The application remains responsible for:
+
+- Business Workflows
+- Workflow Validation
+- Knowledge Retrieval
+- State Management
+- Component Selection
+- UI Rendering
+- Local Persistence
+
+This architecture keeps enterprise workflows deterministic, reliable and testable while still benefiting from modern LLM capabilities.
 Gemini is used **exactly twice** per user message — once for intent + entity extraction, once for friendly response phrasing. Everything else (actions, card descriptors, factory, workflow buttons) stays deterministic. Workflow button clicks (`Submit`, `Modify`, `Cancel`) bypass Gemini and use deterministic keyword detection.
 
 | Step | Location | Entry point |
@@ -179,16 +281,28 @@ Context updates to `status: "submitted"`. **[View Status]** and **[Done]** route
 
 *DevTools view of both Gemini REST calls per message — extraction (structured JSON) and phrasing (friendly chat bubble). Card descriptors (`workflow_draft`, `workflow_success`) are built deterministically from action payloads.*
 
-## Design Principles
+## 🏛 Architecture Principles
 
 - Layered Architecture
 - Single Responsibility Principle (SRP)
 - AI-first orchestration pipeline
-- Intent-driven business actions
+- Intent-driven business workflows
 - Semantic UI descriptors
 - Factory-based GenUI rendering
-- Swappable LLM providers
-- Mock-first development with production-ready extension points
+- Swappable AI providers
+- Repository Pattern
+- Offline-first conversation persistence using MMKV
+
+## 🚀 Key Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| Morning Brief | AI-generated enterprise dashboard |
+| Policy Search | Mini RAG over enterprise policies |
+| Leave Workflow | End-to-end conversational workflow |
+| Conversation Memory | Resume unfinished workflows |
+| Offline Support | Regex fallback when AI is unavailable |
+| Dynamic GenUI | Factory-generated React Native components |
 
 ## Project structure
 
@@ -233,6 +347,19 @@ src/
 
   assets/
 ```
+## 📸 Screenshots
+
+| Morning Brief | Policy Search |
+|---------------|---------------|
+| ![](docs/screenshots/morning-brief.png) | ![](docs/screenshots/policy-search.png) |
+
+| Leave Draft | Modify Request |
+|--------------|----------------|
+| ![](docs/screenshots/leave-apply.png) | ![](docs/screenshots/leave-modify.png) |
+
+| Leave Submitted |
+|-----------------|
+| ![](docs/screenshots/leave-submit.png) |
 
 ## Getting started
 
@@ -293,3 +420,17 @@ Set `useMockData: false` and update `apiBaseUrl` in `src/core/config/appConfig.t
 | `src/application/parser/parseResponse.ts` | Extract descriptors from LLM output |
 | `src/application/factory/componentFactory.ts` | Map descriptors → card components |
 | `src/presentation/components/chat/GenUIRenderer.tsx` | Render factory output |
+
+## 🔮 Future Enhancements
+
+The architecture has been intentionally designed for future enterprise integrations.
+
+Potential extensions include:
+
+- Microsoft Graph integration
+- Azure AI Search / Pinecone Vector Database
+- Calendar synchronization
+- Enterprise authentication (Azure AD / Okta)
+- HRMS integration
+- Expense approval workflow
+- Meeting scheduling workflow
