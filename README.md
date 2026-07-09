@@ -237,10 +237,10 @@ LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
 
 **User:** `Apply leave on 11july its my son's`
 
-1. **Gemini extraction** → `{ intent: "apply_leave", entities: { date: "2026-07-24", reason: "son's birthday" } }`
+1. **Gemini extraction** → `{ intent: "apply_leave", entities: { date: "2026-07-11", reason: "son's birthday" } }`
 2. **Action** → `applyLeave()` saves draft to MMKV with `draftId: "LV-DRAFT-001"`
 3. **Factory** → `LeaveDraftCard` (date, reason, balance, approver)
-4. **Gemini phrasing** → *"Your leave request for July 24..."*
+4. **Gemini phrasing** → *"Your leave request for July 11..."*
 
 #### 2. Modify with conversation memory
 
@@ -257,13 +257,13 @@ Conversation context is already in MMKV:
   "activeWorkflow": "leave",
   "draftId": "LV-DRAFT-001",
   "status": "draft",
-  "draft": { "date": "2026-07-24", "reason": "son's birthday", ... }
+  "draft": { "date": "2026-07-15", "reason": "son's birthday", ... }
 }
 ```
 
 1. **Gemini extraction** (prompt includes active draft) → `{ intent: "modify_leave", entities: { date: "2026-07-25" } }`
 2. **Action** → `modifyLeave()` merges only the changed date into the existing draft — same `draftId`, reason preserved
-3. **Factory** → same `LeaveDraftCard` re-rendered with **25 July 2024**
+3. **Factory** → same `LeaveDraftCard` re-rendered with **15 July 2024**
 4. **Gemini phrasing** → *"Certainly! I'm updating your leave for July 25th..."*
 
 No new card type. No regex. The assistant remembers what you were working on.
