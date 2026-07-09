@@ -4,9 +4,11 @@ import { Button, Card, Text, useTheme } from 'react-native-paper';
 import type { GenUIComponentProps } from '@/application/factory/types';
 import type { NextStepAction } from '@/core/constants/nextSteps';
 
-interface NextStepsCardProps extends GenUIComponentProps {}
+interface NextStepsCardProps extends GenUIComponentProps {
+  onAction?: (label: string) => void;
+}
 
-export function NextStepsCard({ title, metadata }: NextStepsCardProps) {
+export function NextStepsCard({ title, metadata, onAction }: NextStepsCardProps) {
   const theme = useTheme();
   const actions = (metadata?.actions as NextStepAction[] | undefined) ?? [
     'Submit',
@@ -28,7 +30,8 @@ export function NextStepsCard({ title, metadata }: NextStepsCardProps) {
               key={action}
               mode={index === 0 ? 'contained' : 'outlined'}
               style={styles.button}
-              compact>
+              compact
+              onPress={() => onAction?.(action)}>
               {action}
             </Button>
           ))}

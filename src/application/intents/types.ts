@@ -1,5 +1,8 @@
 export type UserIntent =
   | 'apply_leave'
+  | 'submit_leave'
+  | 'modify_leave'
+  | 'cancel_leave'
   | 'daily_brief'
   | 'knowledge_search'
   | 'resume_work'

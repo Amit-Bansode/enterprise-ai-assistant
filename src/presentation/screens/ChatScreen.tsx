@@ -51,7 +51,7 @@ export function ChatScreen() {
           <>
             {isThinking ? <ThinkingIndicator /> : null}
             {!isThinking && components.length > 0 ? (
-              <GenUIRenderer components={components} />
+              <GenUIRenderer components={components} onAction={sendMessage} />
             ) : null}
             <QuickActionRow
               actions={QUICK_ACTIONS}

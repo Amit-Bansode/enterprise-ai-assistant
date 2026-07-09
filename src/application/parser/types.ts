@@ -4,6 +4,8 @@ export type ComponentDescriptorKind =
   | 'task'
   | 'learning'
   | 'workflow_draft'
+  | 'workflow_success'
+  | 'workflow_status'
   | 'knowledge_item'
   | 'workflow_resume'
   | 'action_prompt';

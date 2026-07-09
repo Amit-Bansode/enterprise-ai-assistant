@@ -5,8 +5,15 @@ export type GenUIComponentType =
   | 'MeetingCard'
   | 'TaskCard'
   | 'LearningCard'
-  | 'LeaveCard'
+  | 'LeaveDraftCard'
+  | 'SuccessCard'
+  | 'StatusCard'
   | 'NextStepsCard';
+
+export interface WorkflowAction {
+  label: string;
+  prompt: string;
+}
 
 export interface GenUIComponentProps {
   title: string;

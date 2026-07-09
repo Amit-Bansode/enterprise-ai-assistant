@@ -1,3 +1,10 @@
+jest.mock('react-native-config', () => ({
+  __esModule: true,
+  default: {
+    GEMINI_API_KEY: '',
+  },
+}));
+
 jest.mock('react-native-mmkv', () => ({
   createMMKV: () => ({
     getString: jest.fn(),

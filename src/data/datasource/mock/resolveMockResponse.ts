@@ -9,9 +9,8 @@ export interface MockResponseTemplate {
   components: MockComponentRef[];
 }
 
-const descriptorCatalog: Record<
-  UIComponentDescriptor['kind'],
-  UIComponentDescriptor
+const descriptorCatalog: Partial<
+  Record<UIComponentDescriptor['kind'], UIComponentDescriptor>
 > = {
   daily_summary: {
     id: 'daily_summary',
@@ -58,15 +57,9 @@ const descriptorCatalog: Record<
   workflow_draft: {
     id: 'workflow_draft',
     kind: 'workflow_draft',
-    title: 'Leave Request',
+    title: 'Leave Request Draft',
     body: 'Review your leave details before submitting.',
-    data: {
-      date: 'Tomorrow',
-      reason: 'Personal',
-      balance: '12 Days',
-      approver: 'John Doe',
-      status: 'Draft',
-    },
+    data: {},
   },
   knowledge_item: {
     id: 'knowledge_item',

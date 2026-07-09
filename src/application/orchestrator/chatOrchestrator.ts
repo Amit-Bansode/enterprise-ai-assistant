@@ -6,6 +6,7 @@ import {
   LoadMessagesUseCase,
   SeedAssistantMessageUseCase,
 } from '@/application/usecases/chatUseCases';
+import { clearConversationContext } from '@/application/context/conversationContext';
 import type { UIComponent } from '@/application/factory/types';
 import type { DetectedIntent } from '@/application/intents/types';
 import { thinkingDelay } from '@/core/utils/delay';
@@ -77,6 +78,7 @@ export const chatOrchestrator = {
 
   async clearMessages(): Promise<ChatTurnResult> {
     await clearChatUseCase.execute();
+    clearConversationContext();
     return this.initialize();
   },
 };

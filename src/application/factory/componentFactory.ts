@@ -8,12 +8,20 @@ import type { CardAccent } from '@/presentation/theme/cardAccents';
 
 type DescriptorBuilder = (descriptor: UIComponentDescriptor) => UIComponent | null;
 
+const WORKFLOW_COMPONENTS = new Set([
+  'LeaveDraftCard',
+  'SuccessCard',
+  'StatusCard',
+]);
+
 const accentByKind: Partial<Record<UIComponentDescriptor['kind'], CardAccent>> = {
   daily_summary: 'primary',
   meeting: 'blue',
   task: 'green',
   learning: 'purple',
   workflow_draft: 'orange',
+  workflow_success: 'green',
+  workflow_status: 'blue',
   workflow_resume: 'green',
   knowledge_item: 'purple',
   action_prompt: 'primary',
@@ -64,11 +72,31 @@ const descriptorBuilders: Partial<
   }),
   workflow_draft: descriptor => ({
     id: descriptor.id,
-    component: 'LeaveCard',
+    component: 'LeaveDraftCard',
     props: {
       title: descriptor.title,
       description: descriptor.body,
       accent: accentByKind.workflow_draft,
+      metadata: descriptor.data,
+    },
+  }),
+  workflow_success: descriptor => ({
+    id: descriptor.id,
+    component: 'SuccessCard',
+    props: {
+      title: descriptor.title,
+      description: descriptor.body,
+      accent: accentByKind.workflow_success,
+      metadata: descriptor.data,
+    },
+  }),
+  workflow_status: descriptor => ({
+    id: descriptor.id,
+    component: 'StatusCard',
+    props: {
+      title: descriptor.title,
+      description: descriptor.body,
+      accent: accentByKind.workflow_status,
       metadata: descriptor.data,
     },
   }),
@@ -129,6 +157,14 @@ export function buildComponents(
     })
     .filter((component): component is UIComponent => component !== null)
     .filter(component => component.component !== 'NextStepsCard');
+
+  const hasWorkflowCard = built.some(component =>
+    WORKFLOW_COMPONENTS.has(component.component),
+  );
+
+  if (hasWorkflowCard) {
+    return built;
+  }
 
   return [...built, createNextStepsComponent()];
 }

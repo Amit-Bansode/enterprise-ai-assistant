@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
-import { Chip, Text } from 'react-native-paper';
+import { Button, Chip, Text } from 'react-native-paper';
 
-import type { GenUIComponentProps } from '@/application/factory/types';
+import type { GenUIComponentProps, WorkflowAction } from '@/application/factory/types';
 import { AccentCardShell } from '@/presentation/components/cards/AccentCardShell';
 import { cardAccentColors } from '@/presentation/theme/cardAccents';
 
@@ -10,25 +10,36 @@ interface LeaveField {
   value: string;
 }
 
-interface LeaveCardProps extends GenUIComponentProps {}
+interface LeaveDraftCardProps extends GenUIComponentProps {
+  onAction?: (prompt: string) => void;
+}
 
 function getLeaveFields(metadata?: Record<string, unknown>): LeaveField[] {
   return [
-    { label: 'Date', value: String(metadata?.date ?? '—') },
+    { label: 'Date', value: String(metadata?.dateDisplay ?? metadata?.date ?? '—') },
+    { label: 'Duration', value: String(metadata?.duration ?? '—') },
     { label: 'Reason', value: String(metadata?.reason ?? '—') },
-    { label: 'Balance', value: String(metadata?.balance ?? '—') },
+    { label: 'Leave Type', value: String(metadata?.leaveType ?? '—') },
+    { label: 'Available Balance', value: String(metadata?.balance ?? '—') },
     { label: 'Approver', value: String(metadata?.approver ?? '—') },
-    { label: 'Status', value: String(metadata?.status ?? '—') },
+    { label: 'Status', value: String(metadata?.status ?? 'Draft') },
   ];
 }
 
-export function LeaveCard({ title, metadata, accent = 'orange' }: LeaveCardProps) {
+export function LeaveDraftCard({
+  title,
+  metadata,
+  accent = 'orange',
+  onAction,
+}: LeaveDraftCardProps) {
   const accentColor = cardAccentColors[accent];
   const fields = getLeaveFields(metadata);
+  const actions = (metadata?.actions as WorkflowAction[] | undefined) ?? [];
   const status = String(metadata?.status ?? 'Draft');
 
   return (
     <AccentCardShell title={title} icon="beach" accent={accent}>
+      <View style={styles.divider} />
       <View style={styles.fields}>
         {fields.map(field => (
           <View key={field.label} style={styles.row}>
@@ -50,11 +61,30 @@ export function LeaveCard({ title, metadata, accent = 'orange' }: LeaveCardProps
           </View>
         ))}
       </View>
+      <View style={styles.divider} />
+      <View style={styles.actions}>
+        {actions.map((action, index) => (
+          <Button
+            key={action.label}
+            mode={index === 0 ? 'contained' : 'outlined'}
+            buttonColor={index === 0 ? accentColor : undefined}
+            textColor={index === 0 ? undefined : accentColor}
+            style={styles.button}
+            onPress={() => onAction?.(action.prompt)}>
+            {action.label}
+          </Button>
+        ))}
+      </View>
     </AccentCardShell>
   );
 }
 
 const styles = StyleSheet.create({
+  divider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginVertical: 12,
+  },
   fields: {
     gap: 10,
   },
@@ -65,7 +95,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   label: {
-    width: 88,
+    width: 120,
     opacity: 0.65,
   },
   value: {
@@ -75,5 +105,14 @@ const styles = StyleSheet.create({
   },
   statusChip: {
     alignSelf: 'flex-end',
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  button: {
+    flex: 1,
+    borderRadius: 8,
   },
 });
