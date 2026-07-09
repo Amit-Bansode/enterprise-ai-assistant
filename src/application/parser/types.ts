@@ -1,7 +1,10 @@
 export type ComponentDescriptorKind =
+  | 'daily_summary'
+  | 'meeting'
+  | 'task'
+  | 'learning'
   | 'workflow_draft'
   | 'knowledge_item'
-  | 'daily_summary'
   | 'workflow_resume'
   | 'action_prompt';
 

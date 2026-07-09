@@ -1,5 +1,4 @@
 export const Routes = {
-  Home: 'Home',
   Chat: 'Chat',
 } as const;
 

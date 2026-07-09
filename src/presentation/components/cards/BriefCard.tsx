@@ -1,51 +1,23 @@
 import { StyleSheet } from 'react-native';
-import { Card, Chip, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 import type { GenUIComponentProps } from '@/application/factory/types';
+import { AccentCardShell } from '@/presentation/components/cards/AccentCardShell';
 
 interface BriefCardProps extends GenUIComponentProps {}
 
-export function BriefCard({ title, description, metadata }: BriefCardProps) {
-  const meetings = metadata?.meetings;
-  const pendingApprovals = metadata?.pendingApprovals;
-
+export function BriefCard({ title, description, accent = 'primary' }: BriefCardProps) {
   return (
-    <Card style={styles.card} mode="elevated">
-      <Card.Content>
-        <Text variant="titleMedium">{title}</Text>
-        <Text variant="bodyMedium" style={styles.description}>
-          {description}
-        </Text>
-        {typeof meetings === 'number' || typeof pendingApprovals === 'number' ? (
-          <Card style={styles.statsRow} mode="contained">
-            <Card.Content style={styles.statsContent}>
-              {typeof meetings === 'number' ? (
-                <Chip compact>{meetings} meetings</Chip>
-              ) : null}
-              {typeof pendingApprovals === 'number' ? (
-                <Chip compact>{pendingApprovals} approvals</Chip>
-              ) : null}
-            </Card.Content>
-          </Card>
-        ) : null}
-      </Card.Content>
-    </Card>
+    <AccentCardShell title={title} icon="view-dashboard-outline" accent={accent}>
+      <Text variant="bodyMedium" style={styles.description}>
+        {description}
+      </Text>
+    </AccentCardShell>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    marginHorizontal: 16,
-    marginBottom: 12,
-  },
   description: {
-    marginTop: 8,
-  },
-  statsRow: {
-    marginTop: 12,
-  },
-  statsContent: {
-    flexDirection: 'row',
-    gap: 8,
+    opacity: 0.85,
   },
 });

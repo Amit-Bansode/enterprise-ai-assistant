@@ -55,6 +55,26 @@ export class ChatRepositoryImpl implements ChatRepository {
     return updated;
   }
 
+  async seedAssistantMessage(assistantContent: string): Promise<Message[]> {
+    const now = new Date().toISOString();
+    const messages: Message[] = [
+      {
+        id: createId('assistant'),
+        role: 'assistant',
+        content: assistantContent,
+        createdAt: now,
+      },
+    ];
+
+    await this.localDataSource.saveMessages(messages);
+
+    if (appConfig.useMockData) {
+      await this.mockDataSource.setMessages(messages);
+    }
+
+    return messages;
+  }
+
   async clearMessages(): Promise<void> {
     await this.localDataSource.clearMessages();
     if (appConfig.useMockData) {

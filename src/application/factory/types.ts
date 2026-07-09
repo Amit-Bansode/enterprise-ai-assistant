@@ -1,9 +1,17 @@
-export type GenUIComponentType = 'ActionCard' | 'InfoCard' | 'BriefCard';
+import type { CardAccent } from '@/presentation/theme/cardAccents';
+
+export type GenUIComponentType =
+  | 'BriefCard'
+  | 'MeetingCard'
+  | 'TaskCard'
+  | 'LearningCard'
+  | 'LeaveCard'
+  | 'NextStepsCard';
 
 export interface GenUIComponentProps {
   title: string;
   description: string;
-  actionLabel?: string;
+  accent?: CardAccent;
   metadata?: Record<string, unknown>;
 }
 

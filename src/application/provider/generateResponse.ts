@@ -1,97 +1,62 @@
-import type { AIResponseContext, AIResponse } from '@/application/provider/types';
+import type { AIResponse } from '@/application/provider/types';
 import type { UIComponentDescriptor } from '@/application/parser/types';
+import {
+  getMorningBriefTemplate,
+  normalizeResponse,
+} from '@/data/datasource/mock/resolveMockResponse';
 
-function formatKnowledge(context: AIResponseContext): string {
-  if (!context.knowledge?.items.length) {
-    return '';
-  }
-
-  const citations = context.knowledge.items
-    .map(item => `- ${item.title} (${item.source}): ${item.snippet}`)
-    .join('\n');
-
-  return `\n\nRelevant knowledge:\n${citations}`;
-}
-
-function buildDescriptors(context: AIResponseContext): UIComponentDescriptor[] {
-  const { intent, actionResult, knowledge } = context;
-
-  switch (intent.intent) {
-    case 'apply_leave':
-      return [
-        {
-          id: 'leave_draft',
-          kind: 'workflow_draft',
-          title: 'Leave request draft',
-          body: 'Review dates and submit for manager approval.',
-          data: {
-            actionLabel: 'Review leave request',
-            ...actionResult.payload,
-          },
-        },
-      ];
-    case 'daily_brief':
-      return [
-        {
-          id: 'morning_brief',
-          kind: 'daily_summary',
-          title: 'Morning brief',
-          body: actionResult.summary,
-          data: actionResult.payload,
-        },
-      ];
-    case 'knowledge_search':
-      return (knowledge?.items ?? []).map(item => ({
-        id: item.id,
-        kind: 'knowledge_item' as const,
-        title: item.title,
-        body: item.snippet,
-        data: { source: item.source },
-      }));
-    case 'resume_work':
-      return [
-        {
-          id: 'resume_workflow',
-          kind: 'workflow_resume',
-          title: 'Resume workflow',
-          body: String(
-            actionResult.payload.lastWorkflow ?? 'Continue your last task.',
-          ),
-          data: {
-            actionLabel: 'Continue',
-            ...actionResult.payload,
-          },
-        },
-      ];
-    default:
-      return [];
-  }
-}
-
-export async function generateAIResponse(
-  context: AIResponseContext,
-): Promise<AIResponse> {
-  const knowledgeSection = formatKnowledge(context);
-  const text = [
-    context.actionResult.summary,
-    `Intent: ${context.intent.intent.replace('_', ' ')}.`,
-    knowledgeSection,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .trim();
-
-  const descriptors = buildDescriptors(context);
-
+function toAIResponse(message: string, descriptors: UIComponentDescriptor[]): AIResponse {
   return {
-    text,
-    raw: JSON.stringify(
-      {
-        message: text,
-        descriptors,
-      },
-      null,
-      2,
-    ),
+    text: message,
+    raw: JSON.stringify({ message, descriptors }, null, 2),
   };
+}
+
+export function generateMorningBriefResponse(): AIResponse {
+  const template = getMorningBriefTemplate();
+  const { message, descriptors } = normalizeResponse(template);
+  return toAIResponse(message, descriptors);
+}
+
+function buildDescriptorsForIntent(
+  intent: string,
+): { message: string; descriptors: UIComponentDescriptor[] } | null {
+  switch (intent) {
+    case 'apply_leave':
+      return normalizeResponse({
+        message:
+          'Your leave request for tomorrow is ready. Review the details below and submit when ready.',
+        components: [{ kind: 'workflow_draft' }],
+      });
+    case 'knowledge_search':
+      return normalizeResponse({
+        message: 'Found relevant policy information.',
+        components: [{ kind: 'knowledge_item' }],
+      });
+    case 'resume_work':
+      return normalizeResponse({
+        message: 'Restored your last active workflow.',
+        components: [{ kind: 'workflow_resume' }],
+      });
+    case 'daily_brief':
+      return normalizeResponse(getMorningBriefTemplate());
+    default:
+      return null;
+  }
+}
+
+export async function generateMockResponse(
+  intent: string,
+  summary: string,
+): Promise<AIResponse> {
+  if (intent === 'daily_brief') {
+    return generateMorningBriefResponse();
+  }
+
+  const result = buildDescriptorsForIntent(intent);
+  if (result) {
+    return toAIResponse(result.message, result.descriptors);
+  }
+
+  return toAIResponse(summary, []);
 }

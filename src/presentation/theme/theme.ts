@@ -12,10 +12,15 @@ export const lightTheme: MD3Theme = {
   fonts: fontConfig,
   colors: {
     ...MD3LightTheme.colors,
-    primary: '#1B4D89',
-    secondary: '#0F766E',
-    surface: '#F8FAFC',
-    background: '#FFFFFF',
+    primary: '#2563EB',
+    secondary: '#16A34A',
+    tertiary: '#DBEAFE',
+    surface: '#FFFFFF',
+    background: '#F8FAFC',
+    elevation: {
+      ...MD3LightTheme.colors.elevation,
+      level1: '#EFF6FF',
+    },
   },
 };
 
@@ -24,9 +29,10 @@ export const darkTheme: MD3Theme = {
   fonts: fontConfig,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#7CB9FF',
-    secondary: '#5EEAD4',
-    surface: '#111827',
-    background: '#0B1220',
+    primary: '#60A5FA',
+    secondary: '#4ADE80',
+    tertiary: '#1E3A5F',
+    surface: '#1E293B',
+    background: '#0F172A',
   },
 };

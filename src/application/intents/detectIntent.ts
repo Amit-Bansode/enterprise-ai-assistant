@@ -15,7 +15,7 @@ const intentPatterns: IntentPattern[] = [
   {
     intent: 'daily_brief',
     confidence: 0.88,
-    keywords: ['brief', 'morning brief', 'daily brief', 'standup', 'today'],
+    keywords: ['brief', 'morning brief', 'daily brief', 'standup', 'meetings', 'today'],
   },
   {
     intent: 'knowledge_search',

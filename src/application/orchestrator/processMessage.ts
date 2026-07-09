@@ -3,7 +3,7 @@ import type { UIComponent } from '@/application/factory/types';
 import { detectIntent } from '@/application/intents/detectIntent';
 import type { DetectedIntent } from '@/application/intents/types';
 import { parseResponse } from '@/application/parser/parseResponse';
-import { generateAIResponse } from '@/application/provider/generateResponse';
+import { generateMockResponse } from '@/application/provider/generateResponse';
 import { executeAction } from '@/application/actions';
 import { retrieveKnowledge } from '@/application/retrieval/retrieveKnowledge';
 
@@ -21,14 +21,12 @@ export async function processMessage(userMessage: string): Promise<ProcessMessag
     intent,
   });
 
-  const knowledge = await retrieveKnowledge(userMessage, actionResult);
+  await retrieveKnowledge(userMessage, actionResult);
 
-  const aiResponse = await generateAIResponse({
-    userMessage,
-    intent,
-    actionResult,
-    knowledge,
-  });
+  const aiResponse = await generateMockResponse(
+    intent.intent,
+    actionResult.summary,
+  );
 
   const parsed = parseResponse(aiResponse);
   const components = buildComponents(parsed.descriptors);

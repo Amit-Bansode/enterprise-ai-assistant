@@ -20,6 +20,14 @@ export class AppendChatTurnUseCase {
   }
 }
 
+export class SeedAssistantMessageUseCase {
+  constructor(private readonly chatRepository: ChatRepository) {}
+
+  execute(assistantContent: string): Promise<Message[]> {
+    return this.chatRepository.seedAssistantMessage(assistantContent.trim());
+  }
+}
+
 export class ClearChatUseCase {
   constructor(private readonly chatRepository: ChatRepository) {}
 

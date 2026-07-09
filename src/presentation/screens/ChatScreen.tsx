@@ -1,38 +1,37 @@
 import { useEffect } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Appbar, Text } from 'react-native-paper';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ActivityIndicator, Appbar, Divider, Text } from 'react-native-paper';
 
 import { useChatStore } from '@/application/orchestrator/chatStore';
-import { Routes } from '@/core/constants/routes';
+import { QUICK_ACTIONS } from '@/core/constants/quickActions';
 import { GenUIRenderer } from '@/presentation/components/chat/GenUIRenderer';
 import { ChatInput } from '@/presentation/components/chat/ChatInput';
+import { QuickActionRow } from '@/presentation/components/chat/QuickActionRow';
 import { MessageBubble } from '@/presentation/components/chat/MessageBubble';
 import { ScreenContainer } from '@/presentation/components/common/ScreenContainer';
-import type { RootStackParamList } from '@/presentation/navigation/types';
 
-type Props = NativeStackScreenProps<RootStackParamList, typeof Routes.Chat>;
-
-export function ChatScreen({ navigation }: Props) {
+export function ChatScreen() {
   const {
     messages,
     components,
     isLoading,
+    isInitialized,
     error,
-    loadMessages,
+    initialize,
     sendMessage,
     clearChat,
   } = useChatStore();
 
   useEffect(() => {
-    loadMessages();
-  }, [loadMessages]);
+    if (!isInitialized) {
+      initialize();
+    }
+  }, [initialize, isInitialized]);
 
   return (
     <ScreenContainer>
       <Appbar.Header elevated>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title="Assistant" subtitle="Enterprise chat + GenUI" />
+        <Appbar.Content title="🤖 Enterprise AI Assistant" />
         <Appbar.Action icon="delete-outline" onPress={() => clearChat()} />
       </Appbar.Header>
 
@@ -47,18 +46,24 @@ export function ChatScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={({ item }) => <MessageBubble message={item} />}
         contentContainerStyle={styles.listContent}
-        ListHeaderComponent={
-          components.length > 0 ? <GenUIRenderer components={components} /> : null
-        }
         ListFooterComponent={
-          isLoading ? (
-            <View style={styles.loader}>
-              <ActivityIndicator />
-            </View>
-          ) : null
+          <>
+            {components.length > 0 ? <GenUIRenderer components={components} /> : null}
+            <QuickActionRow
+              actions={QUICK_ACTIONS}
+              onAction={sendMessage}
+              disabled={isLoading}
+            />
+            {isLoading ? (
+              <View style={styles.loader}>
+                <ActivityIndicator />
+              </View>
+            ) : null}
+          </>
         }
       />
 
+      <Divider />
       <ChatInput onSend={sendMessage} disabled={isLoading} />
     </ScreenContainer>
   );

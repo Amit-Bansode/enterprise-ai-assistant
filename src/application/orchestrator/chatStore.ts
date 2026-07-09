@@ -8,8 +8,9 @@ interface ChatState {
   messages: Message[];
   components: UIComponent[];
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
-  loadMessages: () => Promise<void>;
+  initialize: () => Promise<void>;
   sendMessage: (content: string) => Promise<void>;
   clearChat: () => Promise<void>;
 }
@@ -18,17 +19,23 @@ export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   components: [],
   isLoading: false,
+  isInitialized: false,
   error: null,
 
-  loadMessages: async () => {
+  initialize: async () => {
     set({ isLoading: true, error: null });
     try {
-      const messages = await chatOrchestrator.loadMessages();
-      set({ messages, isLoading: false });
+      const result = await chatOrchestrator.initialize();
+      set({
+        messages: result.messages,
+        components: result.components,
+        isLoading: false,
+        isInitialized: true,
+      });
     } catch (error) {
       set({
         isLoading: false,
-        error: error instanceof Error ? error.message : 'Failed to load messages',
+        error: error instanceof Error ? error.message : 'Failed to initialize chat',
       });
     }
   },
@@ -58,8 +65,12 @@ export const useChatStore = create<ChatState>((set) => ({
   clearChat: async () => {
     set({ isLoading: true, error: null });
     try {
-      await chatOrchestrator.clearMessages();
-      set({ messages: [], components: [], isLoading: false });
+      const result = await chatOrchestrator.clearMessages();
+      set({
+        messages: result.messages,
+        components: result.components,
+        isLoading: false,
+      });
     } catch (error) {
       set({
         isLoading: false,

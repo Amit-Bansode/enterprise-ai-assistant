@@ -1,0 +1,9 @@
+{
+  "message": "👋 Good morning Amit.\n\nHere's your personalized briefing for today.",
+  "components": [
+    { "kind": "daily_summary" },
+    { "kind": "meeting" },
+    { "kind": "task" },
+    { "kind": "learning" }
+  ]
+}

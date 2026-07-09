@@ -24,7 +24,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     <View style={styles.container}>
       <TextInput
         mode="outlined"
-        placeholder="Ask anything about workflows, policies, or tasks..."
+        placeholder="Ask me anything..."
         value={value}
         onChangeText={setValue}
         style={styles.input}

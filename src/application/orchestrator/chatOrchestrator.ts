@@ -1,8 +1,10 @@
 import { processMessage } from '@/application/orchestrator/processMessage';
+import { processStartupBrief } from '@/application/orchestrator/processStartupBrief';
 import {
   AppendChatTurnUseCase,
   ClearChatUseCase,
   LoadMessagesUseCase,
+  SeedAssistantMessageUseCase,
 } from '@/application/usecases/chatUseCases';
 import type { UIComponent } from '@/application/factory/types';
 import type { DetectedIntent } from '@/application/intents/types';
@@ -13,6 +15,7 @@ const chatRepository = new ChatRepositoryImpl();
 
 const loadMessagesUseCase = new LoadMessagesUseCase(chatRepository);
 const appendChatTurnUseCase = new AppendChatTurnUseCase(chatRepository);
+const seedAssistantMessageUseCase = new SeedAssistantMessageUseCase(chatRepository);
 const clearChatUseCase = new ClearChatUseCase(chatRepository);
 
 export interface ChatTurnResult {
@@ -22,6 +25,29 @@ export interface ChatTurnResult {
 }
 
 export const chatOrchestrator = {
+  async initialize(): Promise<ChatTurnResult> {
+    const existing = await loadMessagesUseCase.execute();
+    const processed = await processStartupBrief();
+
+    if (existing.length > 0) {
+      return {
+        messages: existing,
+        components: processed.components,
+        intent: processed.intent,
+      };
+    }
+
+    const messages = await seedAssistantMessageUseCase.execute(
+      processed.assistantMessage,
+    );
+
+    return {
+      messages,
+      components: processed.components,
+      intent: processed.intent,
+    };
+  },
+
   loadMessages(): Promise<Message[]> {
     return loadMessagesUseCase.execute();
   },
@@ -40,7 +66,8 @@ export const chatOrchestrator = {
     };
   },
 
-  clearMessages(): Promise<void> {
-    return clearChatUseCase.execute();
+  async clearMessages(): Promise<ChatTurnResult> {
+    await clearChatUseCase.execute();
+    return this.initialize();
   },
 };
