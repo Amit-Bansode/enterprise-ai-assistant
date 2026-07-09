@@ -18,5 +18,11 @@ export async function submitLeave(draft: LeaveDraft): Promise<LeaveSubmitted> {
     expectedApproval: 'Within 24 hours',
     submittedAt: submittedAt.toISOString(),
     submittedDisplay: 'Today',
+    date: draft.date,
+    dateDisplay: draft.dateDisplay,
+    duration: draft.duration,
+    reason: draft.reason,
+    leaveType: draft.leaveType,
+    approver: draft.approver,
   };
 }

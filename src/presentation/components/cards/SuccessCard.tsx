@@ -3,6 +3,7 @@ import { Button, Chip, Text } from 'react-native-paper';
 
 import type { GenUIComponentProps, WorkflowAction } from '@/application/factory/types';
 import { AccentCardShell } from '@/presentation/components/cards/AccentCardShell';
+import { getLeaveDetailFields } from '@/presentation/components/cards/leaveCardFields';
 import { cardAccentColors } from '@/presentation/theme/cardAccents';
 
 interface StatusField {
@@ -16,6 +17,7 @@ interface SuccessCardProps extends GenUIComponentProps {
 
 function getSuccessFields(metadata?: Record<string, unknown>): StatusField[] {
   return [
+    ...getLeaveDetailFields(metadata),
     { label: 'Reference', value: String(metadata?.reference ?? '—') },
     { label: 'Status', value: String(metadata?.status ?? '—') },
     {
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   label: {
-    width: 140,
+    width: 120,
     opacity: 0.65,
   },
   value: {

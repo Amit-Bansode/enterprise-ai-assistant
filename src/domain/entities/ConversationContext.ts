@@ -15,6 +15,12 @@ export interface LeaveSubmitted {
   expectedApproval: string;
   submittedAt: string;
   submittedDisplay: string;
+  date: string;
+  dateDisplay: string;
+  duration: string;
+  reason: string;
+  leaveType: string;
+  approver: string;
 }
 
 export interface ConversationContext {
