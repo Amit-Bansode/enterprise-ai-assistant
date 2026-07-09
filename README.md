@@ -231,7 +231,9 @@ LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
 
 #### 1. Apply leave
 
-![Apply leave — Gemini extracts date and reason from natural language](docs/screenshots/leave-apply.png)
+<p align="center">
+  <img src="docs/screenshots/leave-apply.png" width="320" alt="Apply Leave"/>
+</p>
 
 **User:** `Apply leave on 24july its my son's`
 
@@ -242,7 +244,9 @@ LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
 
 #### 2. Modify with conversation memory
 
-![Modify leave — context-aware update to existing draft](docs/screenshots/leave-modify.png)
+<p align="center">
+  <img src="docs/screenshots/leave-modify.png" width="320" alt="Modify Leave"/>
+</p>
 
 **User:** `Sorry its on 25th july`
 
@@ -266,7 +270,9 @@ No new card type. No regex. The assistant remembers what you were working on.
 
 #### 3. Submit leave
 
-![Submit leave — deterministic action, success card](docs/screenshots/leave-submit.png)
+<p align="center">
+  <img src="docs/screenshots/leave-submit.png" width="320" alt="Leave Submitted"/>
+</p>
 
 **User:** `Submit leave draft`
 
