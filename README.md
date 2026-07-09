@@ -18,30 +18,42 @@ Enterprise AI Assistant is an AI-first React Native prototype demonstrating an i
 ### Layer model
 
 ```
-┌─────────────────────────────────────────────┐
-│              Presentation Layer             │
-│  Screens • Components • Navigation • Theme  │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│             AI Orchestration Layer          │
-│  processMessage • Chat Orchestrator • Store │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│             Application Pipeline            │
-│                                             │
-│ Intent → Action → Retrieval → Provider      │
-│        → Parser → Component Factory         │
-└──────────────────────┬──────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────┐
-│               Data Sources                  │
-│   Mock APIs • Local (MMKV) • Remote APIs    │
-└─────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                  Presentation Layer                          │
+│  Screens • Components • Navigation • Theme • GenUI Renderer  │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                AI Orchestration Layer                        │
+│ processMessage • Chat Orchestrator • Zustand • Conversation  │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                  Application Pipeline                        │
+│                                                              │
+│ Resolve Intent                                               │
+│   ├── Workflow Actions (Deterministic)                       │
+│   ├── Gemini Intent & Entity Extraction                      │
+│   └── Regex Fallback                                         │
+│                ↓                                             │
+│ Business Actions                                             │
+│                ↓                                             │
+│ Knowledge Retrieval (Optional)                               │
+│                ↓                                             │
+│ Gemini Response Phrasing                                     │
+│                ↓                                             │
+│ Response Parser                                              │
+│                ↓                                             │
+│ Component Factory                                            │
+└──────────────────────────────┬───────────────────────────────┘
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                     Data Layer                               │
+│  Mock APIs • MMKV • Remote APIs • Gemini Provider            │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ### Runtime flow
