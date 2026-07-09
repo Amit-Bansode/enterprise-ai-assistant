@@ -30,6 +30,7 @@ export interface ConversationContext {
   draft: LeaveDraft | null;
   submitted: LeaveSubmitted | null;
   lastAction: string | null;
+  pendingModifyField: 'date' | 'duration' | 'reason' | 'leaveType' | null;
 }
 
 export const emptyConversationContext = (): ConversationContext => ({
@@ -39,4 +40,5 @@ export const emptyConversationContext = (): ConversationContext => ({
   draft: null,
   submitted: null,
   lastAction: null,
+  pendingModifyField: null,
 });

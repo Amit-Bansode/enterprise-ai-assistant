@@ -3,6 +3,7 @@ import { AISuggestionCard } from '@/presentation/components/cards/AISuggestionCa
 import { BriefCard } from '@/presentation/components/cards/BriefCard';
 import { LearningCard } from '@/presentation/components/cards/LearningCard';
 import { LeaveDraftCard } from '@/presentation/components/cards/LeaveDraftCard';
+import { LeaveModifyPromptCard } from '@/presentation/components/cards/LeaveModifyPromptCard';
 import { MeetingCard } from '@/presentation/components/cards/MeetingCard';
 import { NextStepsCard } from '@/presentation/components/cards/NextStepsCard';
 import { PolicyCard } from '@/presentation/components/cards/PolicyCard';
@@ -61,6 +62,14 @@ export function GenUIRenderer({ components, onAction }: GenUIRendererProps) {
           case 'LeaveDraftCard':
             return (
               <LeaveDraftCard
+                key={component.id}
+                {...component.props}
+                onAction={onAction}
+              />
+            );
+          case 'LeaveModifyPromptCard':
+            return (
+              <LeaveModifyPromptCard
                 key={component.id}
                 {...component.props}
                 onAction={onAction}

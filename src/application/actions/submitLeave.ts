@@ -4,6 +4,10 @@ import {
   saveConversationContext,
 } from '@/application/context/conversationContext';
 import { submitLeave as submitLeaveApi } from '@/data/datasource/mock/submitLeave';
+import {
+  buildLeaveMessageContext,
+  buildSubmitFallbackMessage,
+} from '@/application/actions/leaveMessageContext';
 
 export async function submitLeaveAction(context: ActionContext): Promise<ActionResult> {
   const contextState = getConversationContext();
@@ -27,10 +31,12 @@ export async function submitLeaveAction(context: ActionContext): Promise<ActionR
     lastAction: 'submit',
   });
 
+  const messageContext = buildLeaveMessageContext(contextState.draft);
+
   return {
     actionId: 'submit_leave',
-    summary: 'Your leave request has been submitted successfully.',
+    summary: buildSubmitFallbackMessage(messageContext, submitted.reference),
     requiresKnowledge: false,
-    payload: { submitted },
+    payload: { submitted, messageContext, reference: submitted.reference },
   };
 }

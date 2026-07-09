@@ -1,4 +1,5 @@
 import { detectKnowledgeQuery } from '@/application/intents/detectKnowledgeQuery';
+import { detectModifySessionUpdate } from '@/application/intents/detectModifySession';
 import type { DetectedIntent } from '@/application/intents/types';
 import { detectWorkflowAction } from '@/application/intents/detectWorkflowAction';
 import { detectIntentFallback } from '@/application/intents/detectIntentFallback';
@@ -9,6 +10,28 @@ import {
   shouldUseGeminiExtraction,
 } from '@/application/provider/extractIntent';
 import { isGeminiConfigured } from '@/application/provider/GeminiProvider';
+
+function coerceActiveDraftIntent(
+  geminiIntent: DetectedIntent,
+  conversationContext: ReturnType<typeof getConversationContext>,
+): DetectedIntent {
+  if (!conversationContext.draft) {
+    return geminiIntent;
+  }
+
+  if (
+    conversationContext.lastAction === 'modify_prompt' ||
+    geminiIntent.intent === 'apply_leave'
+  ) {
+    return {
+      ...geminiIntent,
+      intent: 'modify_leave',
+      confidence: geminiIntent.confidence,
+    };
+  }
+
+  return geminiIntent;
+}
 
 export async function resolveIntent(userMessage: string): Promise<DetectedIntent> {
   const conversationContext = getConversationContext();
@@ -23,6 +46,16 @@ export async function resolveIntent(userMessage: string): Promise<DetectedIntent
     return knowledgeIntent;
   }
 
+  const modifySessionIntent = detectModifySessionUpdate(userMessage, conversationContext);
+  if (modifySessionIntent) {
+    return modifySessionIntent;
+  }
+
+  const conversationModify = detectConversationModify(userMessage, conversationContext);
+  if (conversationModify) {
+    return conversationModify;
+  }
+
   if (isGeminiConfigured()) {
     const geminiIntent = await extractIntentWithGemini(userMessage, conversationContext);
     if (
@@ -30,13 +63,8 @@ export async function resolveIntent(userMessage: string): Promise<DetectedIntent
       geminiIntent.intent !== 'unknown' &&
       shouldUseGeminiExtraction(geminiIntent.intent, userMessage)
     ) {
-      return geminiIntent;
+      return coerceActiveDraftIntent(geminiIntent, conversationContext);
     }
-  }
-
-  const conversationModify = detectConversationModify(userMessage, conversationContext);
-  if (conversationModify) {
-    return conversationModify;
   }
 
   return detectIntentFallback(userMessage);

@@ -1,5 +1,6 @@
 import type { DetectedIntent } from '@/application/intents/types';
-import { parseLeaveSlots } from '@/application/intents/parseLeaveSlots';
+import { parseModifySlots } from '@/application/intents/parseModifySlots';
+import { hasDraftUpdates } from '@/application/actions/leaveDraftUtils';
 import type { ConversationContext } from '@/domain/entities/ConversationContext';
 
 const MODIFY_KEYWORDS = [
@@ -30,22 +31,15 @@ export function detectConversationModify(
     return null;
   }
 
-  const leaveSlots = parseLeaveSlots(text);
-  const slots: Record<string, string> = { trigger: matched };
-
-  if (leaveSlots.date) {
-    slots.date = leaveSlots.date;
-    slots.dateDisplay = leaveSlots.dateDisplay;
-  }
-
-  if (leaveSlots.reason && leaveSlots.reason !== 'Personal') {
-    slots.reason = leaveSlots.reason;
+  const slots = parseModifySlots(text);
+  if (!hasDraftUpdates(slots)) {
+    return null;
   }
 
   return {
     intent: 'modify_leave',
     confidence: 0.88,
     rawText: text,
-    slots,
+    slots: { ...slots, trigger: matched },
   };
 }

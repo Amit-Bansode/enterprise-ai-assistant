@@ -5,6 +5,7 @@ export type ComponentDescriptorKind =
   | 'learning'
   | 'ai_suggestion'
   | 'workflow_draft'
+  | 'workflow_modify_prompt'
   | 'workflow_success'
   | 'workflow_status'
   | 'knowledge_item'

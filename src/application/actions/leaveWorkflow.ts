@@ -3,6 +3,11 @@ import {
   hasDraftUpdates,
   mergeDraftUpdates,
 } from '@/application/actions/leaveDraftUtils';
+import { getModifyFieldGuidance } from '@/application/actions/leaveModifyGuidance';
+import {
+  buildLeaveMessageContext,
+  buildModifyFallbackMessage,
+} from '@/application/actions/leaveMessageContext';
 import {
   clearConversationContext,
   getConversationContext,
@@ -22,28 +27,53 @@ export async function modifyLeave(context: ActionContext): Promise<ActionResult>
   }
 
   if (hasDraftUpdates(context.intent.slots)) {
-    const updatedDraft = mergeDraftUpdates(contextState.draft, context.intent.slots);
+    const { draft: updatedDraft, changedFields } = mergeDraftUpdates(
+      contextState.draft,
+      context.intent.slots,
+    );
+    const messageContext = buildLeaveMessageContext(updatedDraft, changedFields);
 
     saveConversationContext({
       ...contextState,
       draft: updatedDraft,
       lastAction: 'modify',
+      pendingModifyField: null,
     });
 
     return {
       actionId: 'modify_leave',
-      summary: "I've updated your leave draft with the new details.",
+      summary: buildModifyFallbackMessage(messageContext),
       requiresKnowledge: false,
-      payload: { draft: updatedDraft },
+      payload: { draft: updatedDraft, messageContext },
+    };
+  }
+
+  const fieldGuidance = getModifyFieldGuidance(context.userMessage);
+
+  saveConversationContext({
+    ...contextState,
+    lastAction: 'modify_prompt',
+    pendingModifyField: fieldGuidance?.field ?? null,
+  });
+
+  if (fieldGuidance) {
+    return {
+      actionId: 'modify_leave',
+      summary: fieldGuidance.message,
+      requiresKnowledge: false,
+      payload: {
+        modifyPrompt: true,
+        field: fieldGuidance.field,
+        examples: fieldGuidance.examples,
+      },
     };
   }
 
   return {
     actionId: 'modify_leave',
-    summary:
-      'Here is your current leave draft. Update the details and submit when ready.',
+    summary: 'Sure! What would you like to update in your leave request?',
     requiresKnowledge: false,
-    payload: { draft: contextState.draft },
+    payload: { modifyPrompt: true },
   };
 }
 

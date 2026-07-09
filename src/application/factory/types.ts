@@ -8,6 +8,7 @@ export type GenUIComponentType =
   | 'AISuggestionCard'
   | 'PolicyCard'
   | 'LeaveDraftCard'
+  | 'LeaveModifyPromptCard'
   | 'SuccessCard'
   | 'StatusCard'
   | 'NextStepsCard';

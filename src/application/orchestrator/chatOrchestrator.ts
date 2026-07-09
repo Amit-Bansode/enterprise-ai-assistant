@@ -64,10 +64,8 @@ export const chatOrchestrator = {
       thinkingDelay(),
     ]);
 
-    const messages = await appendChatTurnUseCase.execute(
-      content,
-      processed.assistantMessage,
-    );
+    const assistantContent = processed.assistantMessage.trim() || 'Done.';
+    const messages = await appendChatTurnUseCase.execute(content, assistantContent);
 
     return {
       messages,

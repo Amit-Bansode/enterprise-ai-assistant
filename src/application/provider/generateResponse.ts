@@ -6,6 +6,8 @@ import { phraseResponse } from '@/application/provider/phraseResponse';
 import type { KnowledgeItem, KnowledgeResult } from '@/application/retrieval/types';
 import {
   LEAVE_DRAFT_PROMPTS,
+  LEAVE_MODIFY_EXAMPLES,
+  LEAVE_MODIFY_PROMPTS,
   LEAVE_STATUS_PROMPTS,
   LEAVE_SUCCESS_PROMPTS,
 } from '@/core/constants/workflowPrompts';
@@ -59,6 +61,32 @@ function buildPolicyDescriptor(policy: KnowledgeItem): UIComponentDescriptor {
           prompt: `Show full ${policy.title} policy`,
         },
       ],
+    },
+  };
+}
+
+function buildLeaveModifyPromptDescriptor(
+  data: Record<string, unknown> = {},
+): UIComponentDescriptor {
+  const field = data.field as string | undefined;
+  const examples = (data.examples as string[] | undefined) ?? [...LEAVE_MODIFY_EXAMPLES];
+
+  const defaultActions = [
+    { label: '📅 Change Date', prompt: LEAVE_MODIFY_PROMPTS.changeDate },
+    { label: '⏰ Change Duration', prompt: LEAVE_MODIFY_PROMPTS.changeDuration },
+    { label: '📝 Change Reason', prompt: LEAVE_MODIFY_PROMPTS.changeReason },
+    { label: '🏖 Change Leave Type', prompt: LEAVE_MODIFY_PROMPTS.changeLeaveType },
+  ];
+
+  return {
+    id: 'leave_modify_prompt',
+    kind: 'workflow_modify_prompt',
+    title: field ? 'Tell me the new value' : 'What would you like to change?',
+    body: 'Or simply type your changes.',
+    data: {
+      examples,
+      actions: field ? [] : defaultActions,
+      field,
     },
   };
 }
@@ -119,8 +147,15 @@ export async function generateResponse(
     return generateKnowledgeResponse(actionResult, options);
   }
 
-  const fallbackMessage = actionResult.summary;
-  const message = await phraseResponse(intent, actionResult, fallbackMessage);
+  if (intent === 'modify_leave' && actionResult.payload.modifyPrompt) {
+    return toAIResponse(actionResult.summary, [
+      buildLeaveModifyPromptDescriptor(actionResult.payload),
+    ]);
+  }
+
+  const fallbackMessage = actionResult.summary.trim() || 'Done.';
+  const message = (await phraseResponse(intent, actionResult, fallbackMessage)).trim()
+    || fallbackMessage;
   const descriptors = buildDescriptors(intent, actionResult);
 
   return toAIResponse(message, descriptors);
@@ -149,8 +184,14 @@ function buildDescriptors(
   actionResult: ActionResult,
 ): UIComponentDescriptor[] {
   switch (intent) {
-    case 'apply_leave':
     case 'modify_leave': {
+      if (actionResult.payload.modifyPrompt) {
+        return [buildLeaveModifyPromptDescriptor(actionResult.payload)];
+      }
+      const draft = actionResult.payload.draft as Record<string, unknown> | undefined;
+      return draft ? [buildLeaveDraftDescriptor(draft)] : [];
+    }
+    case 'apply_leave': {
       const draft = actionResult.payload.draft as Record<string, unknown> | undefined;
       return draft ? [buildLeaveDraftDescriptor(draft)] : [];
     }
