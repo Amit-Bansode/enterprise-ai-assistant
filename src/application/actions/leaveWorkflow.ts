@@ -1,5 +1,9 @@
 import type { ActionContext, ActionResult } from '@/application/actions/types';
 import {
+  hasDraftUpdates,
+  mergeDraftUpdates,
+} from '@/application/actions/leaveDraftUtils';
+import {
   clearConversationContext,
   getConversationContext,
   saveConversationContext,
@@ -14,6 +18,23 @@ export async function modifyLeave(context: ActionContext): Promise<ActionResult>
       summary: 'No leave draft to modify. Start by applying for leave.',
       requiresKnowledge: false,
       payload: {},
+    };
+  }
+
+  if (hasDraftUpdates(context.intent.slots)) {
+    const updatedDraft = mergeDraftUpdates(contextState.draft, context.intent.slots);
+
+    saveConversationContext({
+      ...contextState,
+      draft: updatedDraft,
+      lastAction: 'modify',
+    });
+
+    return {
+      actionId: 'modify_leave',
+      summary: "I've updated your leave draft with the new details.",
+      requiresKnowledge: false,
+      payload: { draft: updatedDraft },
     };
   }
 

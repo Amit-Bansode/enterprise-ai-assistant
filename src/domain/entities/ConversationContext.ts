@@ -19,6 +19,7 @@ export interface LeaveSubmitted {
 
 export interface ConversationContext {
   activeWorkflow: 'leave' | null;
+  draftId: string | null;
   status: 'draft' | 'submitted' | null;
   draft: LeaveDraft | null;
   submitted: LeaveSubmitted | null;
@@ -27,6 +28,7 @@ export interface ConversationContext {
 
 export const emptyConversationContext = (): ConversationContext => ({
   activeWorkflow: null,
+  draftId: null,
   status: null,
   draft: null,
   submitted: null,

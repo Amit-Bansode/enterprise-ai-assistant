@@ -20,9 +20,9 @@ export async function submitLeaveAction(context: ActionContext): Promise<ActionR
   const submitted = await submitLeaveApi(contextState.draft);
 
   saveConversationContext({
+    ...contextState,
     activeWorkflow: 'leave',
     status: 'submitted',
-    draft: contextState.draft,
     submitted,
     lastAction: 'submit',
   });

@@ -3,6 +3,7 @@ import { geminiProvider, isGeminiConfigured } from '@/application/provider/Gemin
 import { buildExtractionPrompt } from '@/application/provider/prompts/extractionPrompt';
 import { parseModelJson, toValidIntent } from '@/application/provider/parseModelJson';
 import { formatDateDisplay } from '@/core/utils/date';
+import type { ConversationContext } from '@/domain/entities/ConversationContext';
 
 export interface ExtractedEntities {
   date: string;
@@ -43,13 +44,14 @@ function mapExtractionToIntent(
 
 export async function extractIntentWithGemini(
   userMessage: string,
+  conversationContext?: ConversationContext | null,
 ): Promise<DetectedIntent | null> {
   if (!isGeminiConfigured()) {
     return null;
   }
 
   try {
-    const prompt = buildExtractionPrompt(userMessage);
+    const prompt = buildExtractionPrompt(userMessage, conversationContext);
     const raw = await geminiProvider.generate(prompt);
     const extraction = parseModelJson<GeminiExtraction>(raw);
     return mapExtractionToIntent(userMessage, extraction);
@@ -59,10 +61,5 @@ export async function extractIntentWithGemini(
 }
 
 export function shouldUseGeminiExtraction(intent: UserIntent): boolean {
-  return ![
-    'submit_leave',
-    'modify_leave',
-    'cancel_leave',
-    'daily_brief',
-  ].includes(intent);
+  return !['submit_leave', 'cancel_leave', 'daily_brief'].includes(intent);
 }

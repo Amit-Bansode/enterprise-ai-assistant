@@ -2,6 +2,7 @@ import type { ActionContext, ActionResult } from '@/application/actions/types';
 import { saveConversationContext } from '@/application/context/conversationContext';
 import type { LeaveDraft } from '@/domain/entities/ConversationContext';
 import { normalizeDuration } from '@/core/utils/date';
+import { createLeaveDraftId } from '@/core/utils/id';
 
 export async function applyLeave(context: ActionContext): Promise<ActionResult> {
   const { slots } = context.intent;
@@ -19,6 +20,7 @@ export async function applyLeave(context: ActionContext): Promise<ActionResult> 
 
   saveConversationContext({
     activeWorkflow: 'leave',
+    draftId: createLeaveDraftId(),
     status: 'draft',
     draft,
     submitted: null,
