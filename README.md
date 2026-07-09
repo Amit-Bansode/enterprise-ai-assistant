@@ -36,7 +36,9 @@ Instead of allowing AI to control the application, the assistant treats the LLM 
 - Swappable AI provider abstraction
 - Offline fallback when AI is unavailable
 
-  ## 🎥 Demo
+## 🎥 Demo
+
+![Demo](docs/demo.gif)
 
 ### Morning Brief
 
@@ -273,13 +275,17 @@ No new card type. No regex. The assistant remembers what you were working on.
 
 Context updates to `status: "submitted"`. **[View Status]** and **[Done]** route through the same `sendMessage()` pipeline.
 
-### Gemini under the hood
+## 🤖 Gemini Integration
 
-![Gemini extraction — intent + entities from natural language](docs/screenshots/gemini-extraction.png)
+Each user message uses Gemini exactly twice:
 
-![Gemini phrasing — friendly assistant response](docs/screenshots/gemini-phrasing.png)
+1. **Intent & Entity Extraction**
+   - Converts natural language into structured entities.
 
-*DevTools view of both Gemini REST calls per message — extraction (structured JSON) and phrasing (friendly chat bubble). Card descriptors (`workflow_draft`, `workflow_success`) are built deterministically from action payloads.*
+2. **Natural Language Response**
+   - Generates conversational replies while workflows remain deterministic.
+
+Business actions, workflow validation, state management and UI rendering are never delegated to the LLM.
 
 ## 🏛 Architecture Principles
 
