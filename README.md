@@ -1,6 +1,6 @@
 # Enterprise AI Assistant
 
-An AI-first enterprise assistant where employees interact through natural language instead of navigating multiple enterprise applications. The assistant understands user intent, retrieves enterprise knowledge, executes business workflows, and dynamically renders interactive GenUI components inside the conversation.
+Enterprise AI Assistant is an AI-first React Native prototype demonstrating an intent-driven orchestration pipeline, retrieval-augmented knowledge access, and dynamic GenUI rendering using a layered architecture.
 
 ![Gemini extraction — intent + entities from natural language](docs/screenshots/gemini-extraction.png)
 
