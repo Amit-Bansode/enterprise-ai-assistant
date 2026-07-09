@@ -215,7 +215,7 @@ A full leave request in three steps — apply, modify with conversation memory, 
 Step 1 — Apply          Step 2 — Modify              Step 3 — Submit
 ─────────────────       ─────────────────────        ─────────────────
 User: natural language  User: "Sorry its on         User: "Submit leave draft"
-                        25th july"
+                        15th july"
       │                        │                            │
       ▼                        ▼                            ▼
 Gemini extraction       MMKV context loaded           Deterministic keyword
@@ -235,7 +235,7 @@ LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
   <img src="docs/screenshots/leave-apply.png" width="320" alt="Apply Leave"/>
 </p>
 
-**User:** `Apply leave on 24july its my son's`
+**User:** `Apply leave on 11july its my son's`
 
 1. **Gemini extraction** → `{ intent: "apply_leave", entities: { date: "2026-07-24", reason: "son's birthday" } }`
 2. **Action** → `applyLeave()` saves draft to MMKV with `draftId: "LV-DRAFT-001"`
@@ -248,7 +248,7 @@ LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
   <img src="docs/screenshots/leave-modify.png" width="320" alt="Modify Leave"/>
 </p>
 
-**User:** `Sorry its on 25th july`
+**User:** `Sorry its on 15th july`
 
 Conversation context is already in MMKV:
 
