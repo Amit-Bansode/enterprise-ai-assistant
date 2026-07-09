@@ -3,11 +3,12 @@ import { create } from 'zustand';
 import { chatOrchestrator } from '@/application/orchestrator/chatOrchestrator';
 import type { UIComponent } from '@/application/factory/types';
 import type { Message } from '@/domain/entities/Message';
+import { createId } from '@/core/utils/id';
 
 interface ChatState {
   messages: Message[];
   components: UIComponent[];
-  isLoading: boolean;
+  isThinking: boolean;
   isInitialized: boolean;
   error: string | null;
   initialize: () => Promise<void>;
@@ -18,62 +19,76 @@ interface ChatState {
 export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   components: [],
-  isLoading: false,
+  isThinking: false,
   isInitialized: false,
   error: null,
 
   initialize: async () => {
-    set({ isLoading: true, error: null });
+    set({ isThinking: true, error: null });
     try {
       const result = await chatOrchestrator.initialize();
       set({
         messages: result.messages,
         components: result.components,
-        isLoading: false,
+        isThinking: false,
         isInitialized: true,
       });
     } catch (error) {
       set({
-        isLoading: false,
+        isThinking: false,
         error: error instanceof Error ? error.message : 'Failed to initialize chat',
       });
     }
   },
 
   sendMessage: async (content: string) => {
-    if (!content.trim()) {
+    const trimmed = content.trim();
+    if (!trimmed) {
       return;
     }
 
-    set({ isLoading: true, error: null });
+    const optimisticMessage: Message = {
+      id: createId('user'),
+      role: 'user',
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+    };
+
+    set(state => ({
+      isThinking: true,
+      error: null,
+      messages: [...state.messages, optimisticMessage],
+      components: [],
+    }));
+
     try {
-      const turn = await chatOrchestrator.sendMessage(content);
+      const turn = await chatOrchestrator.sendMessage(trimmed);
 
       set({
         messages: turn.messages,
         components: turn.components,
-        isLoading: false,
+        isThinking: false,
       });
     } catch (error) {
       set({
-        isLoading: false,
+        isThinking: false,
         error: error instanceof Error ? error.message : 'Failed to send message',
       });
     }
   },
 
   clearChat: async () => {
-    set({ isLoading: true, error: null });
+    set({ isThinking: true, error: null, components: [] });
     try {
       const result = await chatOrchestrator.clearMessages();
       set({
         messages: result.messages,
         components: result.components,
-        isLoading: false,
+        isThinking: false,
       });
     } catch (error) {
       set({
-        isLoading: false,
+        isThinking: false,
         error: error instanceof Error ? error.message : 'Failed to clear chat',
       });
     }

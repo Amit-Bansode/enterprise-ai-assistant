@@ -8,6 +8,7 @@ import {
 } from '@/application/usecases/chatUseCases';
 import type { UIComponent } from '@/application/factory/types';
 import type { DetectedIntent } from '@/application/intents/types';
+import { thinkingDelay } from '@/core/utils/delay';
 import { ChatRepositoryImpl } from '@/data/repository/ChatRepositoryImpl';
 import type { Message } from '@/domain/entities/Message';
 
@@ -27,7 +28,11 @@ export interface ChatTurnResult {
 export const chatOrchestrator = {
   async initialize(): Promise<ChatTurnResult> {
     const existing = await loadMessagesUseCase.execute();
-    const processed = await processStartupBrief();
+
+    const [processed] = await Promise.all([
+      processStartupBrief(),
+      thinkingDelay(),
+    ]);
 
     if (existing.length > 0) {
       return {
@@ -53,7 +58,11 @@ export const chatOrchestrator = {
   },
 
   async sendMessage(content: string): Promise<ChatTurnResult> {
-    const processed = await processMessage(content);
+    const [processed] = await Promise.all([
+      processMessage(content),
+      thinkingDelay(),
+    ]);
+
     const messages = await appendChatTurnUseCase.execute(
       content,
       processed.assistantMessage,

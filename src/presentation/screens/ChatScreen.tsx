@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { ActivityIndicator, Appbar, Divider, Text } from 'react-native-paper';
+import { FlatList, StyleSheet } from 'react-native';
+import { Appbar, Divider, Text } from 'react-native-paper';
 
 import { useChatStore } from '@/application/orchestrator/chatStore';
 import { QUICK_ACTIONS } from '@/core/constants/quickActions';
@@ -8,13 +8,14 @@ import { GenUIRenderer } from '@/presentation/components/chat/GenUIRenderer';
 import { ChatInput } from '@/presentation/components/chat/ChatInput';
 import { QuickActionRow } from '@/presentation/components/chat/QuickActionRow';
 import { MessageBubble } from '@/presentation/components/chat/MessageBubble';
+import { ThinkingIndicator } from '@/presentation/components/chat/ThinkingIndicator';
 import { ScreenContainer } from '@/presentation/components/common/ScreenContainer';
 
 export function ChatScreen() {
   const {
     messages,
     components,
-    isLoading,
+    isThinking,
     isInitialized,
     error,
     initialize,
@@ -48,23 +49,21 @@ export function ChatScreen() {
         contentContainerStyle={styles.listContent}
         ListFooterComponent={
           <>
-            {components.length > 0 ? <GenUIRenderer components={components} /> : null}
+            {isThinking ? <ThinkingIndicator /> : null}
+            {!isThinking && components.length > 0 ? (
+              <GenUIRenderer components={components} />
+            ) : null}
             <QuickActionRow
               actions={QUICK_ACTIONS}
               onAction={sendMessage}
-              disabled={isLoading}
+              disabled={isThinking}
             />
-            {isLoading ? (
-              <View style={styles.loader}>
-                <ActivityIndicator />
-              </View>
-            ) : null}
           </>
         }
       />
 
       <Divider />
-      <ChatInput onSend={sendMessage} disabled={isLoading} />
+      <ChatInput onSend={sendMessage} disabled={isThinking} />
     </ScreenContainer>
   );
 }
@@ -73,9 +72,6 @@ const styles = StyleSheet.create({
   listContent: {
     paddingVertical: 16,
     flexGrow: 1,
-  },
-  loader: {
-    paddingVertical: 12,
   },
   error: {
     color: '#B91C1C',
