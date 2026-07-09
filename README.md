@@ -38,7 +38,9 @@ Instead of allowing AI to control the application, the assistant treats the LLM 
 
 ## 🎥 Demo
 
-![Demo](docs/demo.gif)
+<p align="center">
+  <img src="docs/demo.gif" width="300" alt="Enterprise AI Assistant Demo"/>
+</p>
 
 ### Morning Brief
 
