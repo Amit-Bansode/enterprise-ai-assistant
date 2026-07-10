@@ -1,63 +1,38 @@
-import { formatDateDisplayFromParts, toIsoDateFromLocalDate } from '@/core/utils/date';
+import { parseNaturalLanguageDate } from '@/core/utils/date';
 
-const MONTHS: Record<string, number> = {
-  january: 0,
-  february: 1,
-  march: 2,
-  april: 3,
-  may: 4,
-  june: 5,
-  july: 6,
-  august: 7,
-  september: 8,
-  october: 9,
-  november: 10,
-  december: 11,
-};
-
-function parseExplicitDate(text: string): Date | null {
-  const match = text.match(
-    /(\d{1,2})(?:st|nd|rd|th)?\s+(january|february|march|april|may|june|july|august|september|october|november|december)(?:\s+(\d{4}))?/i,
-  );
-
-  if (!match) {
-    return null;
-  }
-
-  const day = Number(match[1]);
-  const month = MONTHS[match[2].toLowerCase()];
-  const year = match[3] ? Number(match[3]) : 2026;
-
-  return new Date(year, month, day);
-}
-
-function parseRelativeDate(text: string): Date | null {
-  const normalized = text.toLowerCase();
-  const date = new Date();
-
-  if (normalized.includes('tomorrow')) {
-    date.setDate(date.getDate() + 1);
-    return date;
-  }
-
-  if (normalized.includes('today')) {
-    return date;
-  }
-
-  return null;
-}
-
-function parseReason(text: string): string {
-  const match = text.match(/\bfor\s+(.+)$/i);
-  if (!match) {
-    return 'Personal';
-  }
-
-  return match[1]
+function titleCase(text: string): string {
+  return text
     .trim()
     .split(/\s+/)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
+}
+
+function parseReason(text: string): string {
+  if (/\bbirthday\b/i.test(text)) {
+    if (/\b(?:my\s+)?son(?:'s)?\b/i.test(text)) {
+      return "Son's Birthday";
+    }
+    if (/\b(?:my\s+)?daughter(?:'s)?\b/i.test(text)) {
+      return "Daughter's Birthday";
+    }
+    return 'Birthday';
+  }
+
+  const patterns = [
+    /\b(?:its|it's|it is)\s+(?:my\s+)?(.+)$/i,
+    /\bbecause\s+(?:its|it's|it is)\s+(?:my\s+)?(.+)$/i,
+    /\bfor\s+(.+)$/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]?.trim()) {
+      return titleCase(match[1].trim());
+    }
+  }
+
+  return 'Personal';
 }
 
 export interface LeaveSlots {
@@ -67,16 +42,20 @@ export interface LeaveSlots {
 }
 
 export function parseLeaveSlots(text: string): LeaveSlots {
-  const parsedDate = parseExplicitDate(text) ?? parseRelativeDate(text) ?? new Date(2026, 6, 10);
+  const parsedDate = parseNaturalLanguageDate(text);
   const reason = parseReason(text);
 
+  if (parsedDate) {
+    return {
+      date: parsedDate.iso,
+      dateDisplay: parsedDate.display,
+      reason,
+    };
+  }
+
   return {
-    date: toIsoDateFromLocalDate(parsedDate),
-    dateDisplay: formatDateDisplayFromParts(
-      parsedDate.getFullYear(),
-      parsedDate.getMonth(),
-      parsedDate.getDate(),
-    ),
+    date: '',
+    dateDisplay: '',
     reason,
   };
 }

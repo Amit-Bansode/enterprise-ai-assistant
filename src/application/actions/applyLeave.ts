@@ -12,8 +12,8 @@ export async function applyLeave(context: ActionContext): Promise<ActionResult> 
   const { slots } = context.intent;
 
   const draft: LeaveDraft = {
-    date: slots.date ?? '2026-07-10',
-    dateDisplay: slots.dateDisplay ?? '10 July 2026',
+    date: slots.date?.trim() ?? '',
+    dateDisplay: slots.dateDisplay?.trim() ?? '',
     duration: normalizeDuration(slots.duration),
     reason: slots.reason?.trim() || 'Personal',
     leaveType: slots.leaveType?.trim() || 'Annual Leave',

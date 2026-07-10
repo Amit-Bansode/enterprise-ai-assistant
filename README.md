@@ -61,19 +61,19 @@ The assistant retrieves relevant enterprise policies and generates contextual an
 Natural conversation:
 
 ```
-Apply leave on 25 July because it's my son's birthday.
+Apply leave on 24th July — it's my son's birthday.
 
 ↓
 
-Leave Draft
+Leave Draft (24 July 2026)
 
 ↓
 
-Sorry, change it to 26 July.
+Modify → Date is 25 july
 
 ↓
 
-Updated Draft
+Updated Draft (25 July 2026)
 
 ↓
 
@@ -81,7 +81,7 @@ Submit
 
 ↓
 
-Success
+Success (LV-2026-00127)
 ```
 
 ### Resume Workflow
@@ -212,21 +212,21 @@ The AI orchestration layer (`processMessage.ts`) wires the pipeline together. Th
 A full leave request in three steps — apply, modify with conversation memory, submit.
 
 ```
-Step 1 — Apply          Step 2 — Modify              Step 3 — Submit
-─────────────────       ─────────────────────        ─────────────────
-User: natural language  User: "Sorry its on         User: "Submit leave draft"
-                        25th july"
-      │                        │                            │
-      ▼                        ▼                            ▼
-Gemini extraction       MMKV context loaded           Deterministic keyword
-apply_leave + entities  modify_leave + date           submit_leave
-      │                        │                            │
-      ▼                        ▼                            ▼
-applyLeave()            mergeDraftUpdates()           submitLeaveAction()
-draft → MMKV            same draftId updated          mock API → reference
-      │                        │                            │
-      ▼                        ▼                            ▼
-LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
+Step 1 — Apply              Step 2 — Modify date           Step 3 — Submit
+─────────────────           ─────────────────────          ─────────────────
+User: "Apply leave on       User: [Modify] →               User: "Submit leave draft"
+24th July its my son's"     "Date is 25 july"
+      │                            │                              │
+      ▼                            ▼                              ▼
+Gemini + local date parse   MMKV context loaded              Deterministic keyword
+apply_leave + entities      modify_leave + date              submit_leave
+      │                            │                              │
+      ▼                            ▼                              ▼
+applyLeave()                mergeDraftUpdates()              submitLeaveAction()
+draft → MMKV (24 July)      same draftId → 25 July           mock API → LV-2026-00127
+      │                            │                              │
+      ▼                            ▼                              ▼
+LeaveDraftCard              LeaveDraftCard (updated)         SuccessCard
 ```
 
 #### 1. Apply leave
@@ -235,20 +235,22 @@ LeaveDraftCard          LeaveDraftCard (updated)      SuccessCard
   <img src="docs/screenshots/leave-apply.png" width="320" alt="Apply Leave"/>
 </p>
 
-**User:** `Apply leave on 24july its my son's`
+**User:** `Apply leave on 24th July its my son's`
 
-1. **Gemini extraction** → `{ intent: "apply_leave", entities: { date: "2026-07-24", reason: "son's birthday" } }`
+1. **Gemini extraction** + **local date parser** → `{ intent: "apply_leave", entities: { date: "2026-07-24", reason: "Son's Birthday" } }`
 2. **Action** → `applyLeave()` saves draft to MMKV with `draftId: "LV-DRAFT-001"`
-3. **Factory** → `LeaveDraftCard` (date, reason, balance, approver)
-4. **Gemini phrasing** → *"Your leave request for July 24..."*
+3. **Factory** → `LeaveDraftCard` — **24 July 2026**, reason **Son's Birthday**, balance, approver
+4. **Gemini phrasing** → *"I've prepared a leave request for 24 July 2026 for your review..."*
+
+Compact dates like `24july` and ordinal forms like `24th July` are parsed locally so the draft always matches what the user typed.
 
 #### 2. Modify with conversation memory
 
 <p align="center">
-  <img src="docs/screenshots/leave-modify.png" width="320" alt="Modify Leave"/>
+  <img src="docs/screenshots/leave-modify-date.png" width="320" alt="Modify Leave Date"/>
 </p>
 
-**User:** `Sorry its on 25th july`
+**User:** taps **[Modify]** → `Date is 25 july`
 
 Conversation context is already in MMKV:
 
@@ -257,16 +259,16 @@ Conversation context is already in MMKV:
   "activeWorkflow": "leave",
   "draftId": "LV-DRAFT-001",
   "status": "draft",
-  "draft": { "date": "2026-07-24", "reason": "son's birthday", ... }
+  "draft": { "date": "2026-07-24", "reason": "Son's Birthday", ... }
 }
 ```
 
 1. **Gemini extraction** (prompt includes active draft) → `{ intent: "modify_leave", entities: { date: "2026-07-25" } }`
-2. **Action** → `modifyLeave()` merges only the changed date into the existing draft — same `draftId`, reason preserved
-3. **Factory** → same `LeaveDraftCard` re-rendered with **25 July 2024**
-4. **Gemini phrasing** → *"Certainly! I'm updating your leave for July 25th..."*
+2. **Action** → `modifyLeave()` merges only the changed date into the existing draft — same `draftId`, reason **Son's Birthday** preserved
+3. **Factory** → same `LeaveDraftCard` re-rendered with **25 July 2026**
+4. **Gemini phrasing** → *"I've updated your leave date to 25 July 2026 while keeping the remaining details unchanged..."*
 
-No new card type. No regex. The assistant remembers what you were working on.
+No new card type. The assistant remembers what you were working on.
 
 #### 3. Submit leave
 
@@ -278,8 +280,8 @@ No new card type. No regex. The assistant remembers what you were working on.
 
 1. **Intent** → `detectWorkflowAction()` matches keyword — **no Gemini** (deterministic)
 2. **Action** → `submitLeaveAction()` calls mock API, returns `LV-2026-00127`
-3. **Factory** → `SuccessCard` with reference, status, expected approval
-4. **Gemini phrasing** → *"Your leave request, LV-2026-00127, has been submitted..."*
+3. **Factory** → `SuccessCard` — **25 July 2026**, **Son's Birthday**, reference `LV-2026-00127`, pending manager approval
+4. **Gemini phrasing** → *"Your leave request, LV-2026-00127, has been submitted successfully..."*
 
 Context updates to `status: "submitted"`. **[View Status]** and **[Done]** route through the same `sendMessage()` pipeline.
 
@@ -382,7 +384,7 @@ src/
     </td>
     <td align="center">
       <b>✏️ Modify Leave</b><br/><br/>
-      <img src="docs/screenshots/leave-modify.png" width="280" alt="Modify Leave"/>
+      <img src="docs/screenshots/leave-modify-date.png" width="280" alt="Modify Leave Date"/>
     </td>
   </tr>
 

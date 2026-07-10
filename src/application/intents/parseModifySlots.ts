@@ -1,37 +1,5 @@
 import type { ModifyField } from '@/application/actions/leaveModifyGuidance';
-import {
-  formatDateDisplayFromParts,
-  normalizeDuration,
-  toIsoDateFromLocalDate,
-  toIsoDateString,
-} from '@/core/utils/date';
-
-const MONTHS: Record<string, number> = {
-  january: 0,
-  jan: 0,
-  february: 1,
-  feb: 1,
-  march: 2,
-  mar: 2,
-  april: 3,
-  apr: 3,
-  may: 4,
-  june: 5,
-  jun: 5,
-  july: 6,
-  jul: 6,
-  august: 7,
-  aug: 7,
-  september: 8,
-  sep: 8,
-  sept: 8,
-  october: 9,
-  oct: 9,
-  november: 10,
-  nov: 10,
-  december: 11,
-  dec: 11,
-};
+import { normalizeDuration, parseNaturalLanguageDate } from '@/core/utils/date';
 
 function titleCase(text: string): string {
   return text
@@ -39,49 +7,6 @@ function titleCase(text: string): string {
     .split(/\s+/)
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
-}
-
-function parseDateFromText(text: string): { iso: string; display: string } | null {
-  const dayMonthYear = text.match(
-    /(\d{1,2})(?:st|nd|rd|th)?\s*(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)(?:\s+(\d{4}))?/i,
-  );
-
-  if (dayMonthYear) {
-    const day = Number(dayMonthYear[1]);
-    const month = MONTHS[dayMonthYear[2].toLowerCase()];
-    const year = dayMonthYear[3] ? Number(dayMonthYear[3]) : 2026;
-    const iso = toIsoDateString(year, month, day);
-    return { iso, display: formatDateDisplayFromParts(year, month, day) };
-  }
-
-  const monthDay = text.match(
-    /(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\s+(\d{1,2})(?:st|nd|rd|th)?(?:\s+(\d{4}))?/i,
-  );
-
-  if (monthDay) {
-    const month = MONTHS[monthDay[1].toLowerCase()];
-    const day = Number(monthDay[2]);
-    const year = monthDay[3] ? Number(monthDay[3]) : 2026;
-    const iso = toIsoDateString(year, month, day);
-    return { iso, display: formatDateDisplayFromParts(year, month, day) };
-  }
-
-  const normalized = text.toLowerCase();
-  if (normalized.includes('tomorrow')) {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const iso = toIsoDateFromLocalDate(tomorrow);
-    return {
-      iso,
-      display: formatDateDisplayFromParts(
-        tomorrow.getFullYear(),
-        tomorrow.getMonth(),
-        tomorrow.getDate(),
-      ),
-    };
-  }
-
-  return null;
 }
 
 function parseDurationFromText(text: string): string | null {
@@ -126,14 +51,18 @@ function parseLeaveTypeFromText(text: string): string | null {
 }
 
 function parseReasonFromText(text: string): string | null {
-  const reasonMatch = text.match(/\breason\s*(?:is|:)\s*(.+)$/i);
-  if (reasonMatch) {
-    return titleCase(reasonMatch[1]);
-  }
+  const patterns = [
+    /\breason\s*(?:is|:)\s*(.+)$/i,
+    /\b(?:its|it's|it is)\s+(?:my\s+)?(.+)$/i,
+    /\bbecause\s+(?:its|it's|it is)\s+(?:my\s+)?(.+)$/i,
+    /\bfor\s+(.+)$/i,
+  ];
 
-  const forMatch = text.match(/\bfor\s+(.+)$/i);
-  if (forMatch) {
-    return titleCase(forMatch[1]);
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]?.trim()) {
+      return titleCase(match[1].trim());
+    }
   }
 
   return null;
@@ -151,7 +80,7 @@ export function parseModifySlots(
   }
 
   if (pendingField === 'date' || !pendingField) {
-    const parsedDate = parseDateFromText(trimmed);
+    const parsedDate = parseNaturalLanguageDate(trimmed);
     if (parsedDate) {
       slots.date = parsedDate.iso;
       slots.dateDisplay = parsedDate.display;
@@ -182,14 +111,8 @@ export function parseModifySlots(
     slots.reason = reason;
   }
 
-  if (
-    pendingField === 'date' &&
-    !slots.date &&
-    !slots.reason &&
-    !slots.duration &&
-    !slots.leaveType
-  ) {
-    const parsedDate = parseDateFromText(trimmed);
+  if (pendingField === 'date' && !slots.date) {
+    const parsedDate = parseNaturalLanguageDate(trimmed);
     if (parsedDate) {
       slots.date = parsedDate.iso;
       slots.dateDisplay = parsedDate.display;

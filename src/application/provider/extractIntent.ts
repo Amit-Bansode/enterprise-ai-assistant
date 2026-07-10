@@ -3,7 +3,8 @@ import { isPolicyQuestion } from '@/application/intents/detectKnowledgeQuery';
 import { geminiProvider, isGeminiConfigured } from '@/application/provider/GeminiProvider';
 import { buildExtractionPrompt } from '@/application/provider/prompts/extractionPrompt';
 import { parseModelJson, toValidIntent } from '@/application/provider/parseModelJson';
-import { formatDateDisplay } from '@/core/utils/date';
+import { formatDateDisplay, parseNaturalLanguageDate } from '@/core/utils/date';
+import { parseLeaveSlots } from '@/application/intents/parseLeaveSlots';
 import type { ConversationContext } from '@/domain/entities/ConversationContext';
 
 export interface ExtractedEntities {
@@ -24,8 +25,15 @@ function mapExtractionToIntent(
 ): DetectedIntent {
   const intent = toValidIntent(extraction.intent);
   const entities = extraction.entities ?? {};
-  const date = entities.date?.trim() ?? '';
-  const reason = entities.reason?.trim() ?? '';
+  const localSlots = parseLeaveSlots(userMessage);
+  const parsedLocalDate = parseNaturalLanguageDate(userMessage);
+
+  const geminiDate = entities.date?.trim() ?? '';
+  const date = parsedLocalDate?.iso ?? geminiDate ?? localSlots.date;
+  const dateDisplay =
+    parsedLocalDate?.display ??
+    (date ? formatDateDisplay(date) || date : localSlots.dateDisplay);
+  const reason = entities.reason?.trim() || localSlots.reason;
   const duration = entities.duration?.trim() ?? '';
   const leaveType = entities.leaveType?.trim() ?? '';
 
@@ -35,7 +43,7 @@ function mapExtractionToIntent(
     rawText: userMessage,
     slots: {
       date,
-      dateDisplay: formatDateDisplay(date) || date,
+      dateDisplay,
       reason,
       duration,
       leaveType,
