@@ -170,6 +170,7 @@ Factory
 ▼
 Presentation
 ```
+
 ## 🧠 AI Design Philosophy
 
 Unlike traditional AI chat applications, the Large Language Model does **not** control application behavior.
@@ -315,7 +316,7 @@ Business actions, workflow validation, state management and UI rendering are nev
 | Capability | Description |
 |------------|-------------|
 | Morning Brief | AI-generated enterprise dashboard |
-| Policy Search | Retrieval-Augmented Generation (Mini RAG)over enterprise policies |
+| Policy Search | Retrieval-Augmented Generation (Mini RAG) over enterprise policies |
 | Leave Workflow | End-to-end conversational workflow |
 | Conversation Memory | Resume unfinished workflows |
 | Offline Support | Regex fallback when AI is unavailable |
