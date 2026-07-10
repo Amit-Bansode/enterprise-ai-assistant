@@ -5,6 +5,7 @@
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 # Enterprise AI Assistant
+> AI-powered Enterprise Assistant demonstrating deterministic enterprise workflows with React Native and Google Gemini.
 
 An AI-powered Enterprise Assistant built with **React Native CLI**, **TypeScript**, and **Google Gemini** that demonstrates how Large Language Models can be combined with deterministic enterprise workflows using a layered architecture.
 
@@ -17,7 +18,7 @@ Instead of allowing AI to control the application, the assistant treats the LLM 
 - 🌅 AI-powered Morning Brief with meetings, approvals and learning recommendations
 - 🧠 Gemini-powered intent recognition and entity extraction
 - 💬 Natural language conversations with multi-turn context
-- 📘 Enterprise policy search using a Mini RAG architecture
+- 📘 Enterprise policy search using a Retrieval-Augmented Generation (Mini RAG)
 - ♻ Resume active workflows from previous sessions
 
 ### 💼 Enterprise Workflows
@@ -95,13 +96,13 @@ The assistant remembers unfinished work using MMKV conversation context and resu
 - State: Zustand
 - Storage: `react-native-mmkv`
 - Networking: Axios
-- AI: Google Gemini 2.5 Flash (REST, no SDK) via `react-native-config`
+- AI: Google Gemini 2.5 Flash (REST API) via `react-native-config`
 - UI: React Native Paper + Vector Icons
-- Animation: Reanimated (installed, ready when needed)
+- Animation: React Native Reanimated
 
 ## Architecture
 
-### Layer model
+### System Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
@@ -142,7 +143,7 @@ The assistant remembers unfinished work using MMKV conversation context and resu
 └──────────────────────────────────────────────────────────────┘
 ```
 
-### Runtime flow
+### AI Processing Pipeline
 
 ```
 User
@@ -158,13 +159,13 @@ resolveIntent()
 Business Actions
 │
 ▼
+Gemini Phrasing
+│
+▼
 Parser
 │
 ▼
 Factory
-│
-▼
-Gemini Phrasing
 │
 ▼
 Presentation
@@ -314,7 +315,7 @@ Business actions, workflow validation, state management and UI rendering are nev
 | Capability | Description |
 |------------|-------------|
 | Morning Brief | AI-generated enterprise dashboard |
-| Policy Search | Mini RAG over enterprise policies |
+| Policy Search | Retrieval-Augmented Generation (Mini RAG)over enterprise policies |
 | Leave Workflow | End-to-end conversational workflow |
 | Conversation Memory | Resume unfinished workflows |
 | Offline Support | Regex fallback when AI is unavailable |
