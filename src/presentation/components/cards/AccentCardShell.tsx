@@ -4,8 +4,8 @@ import { Card, Icon, Text, useTheme } from 'react-native-paper';
 
 import type { CardAccent } from '@/presentation/theme/cardAccents';
 import {
-  cardAccentBackgrounds,
   cardAccentColors,
+  getCardAccentBackground,
 } from '@/presentation/theme/cardAccents';
 
 interface AccentCardShellProps extends PropsWithChildren {
@@ -22,7 +22,7 @@ export function AccentCardShell({
 }: AccentCardShellProps) {
   const theme = useTheme();
   const accentColor = cardAccentColors[accent];
-  const accentBackground = cardAccentBackgrounds[accent];
+  const accentBackground = getCardAccentBackground(accent, theme.dark);
 
   return (
     <Card
@@ -32,7 +32,7 @@ export function AccentCardShell({
       <Card.Content style={styles.content}>
         <View style={[styles.header, { backgroundColor: accentBackground }]}>
           <Icon source={icon} size={20} color={accentColor} />
-          <Text variant="titleMedium" style={styles.title}>
+          <Text variant="titleMedium" style={[styles.title, { color: accentColor }]}>
             {title}
           </Text>
         </View>

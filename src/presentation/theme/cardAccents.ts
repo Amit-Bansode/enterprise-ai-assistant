@@ -15,3 +15,15 @@ export const cardAccentBackgrounds: Record<CardAccent, string> = {
   orange: '#FFF7ED',
   primary: '#EFF6FF',
 };
+
+export const cardAccentBackgroundsDark: Record<CardAccent, string> = {
+  blue: '#1E3A5F',
+  green: '#14532D',
+  purple: '#3B0764',
+  orange: '#7C2D12',
+  primary: '#1E3A5F',
+};
+
+export function getCardAccentBackground(accent: CardAccent, isDark: boolean): string {
+  return isDark ? cardAccentBackgroundsDark[accent] : cardAccentBackgrounds[accent];
+}

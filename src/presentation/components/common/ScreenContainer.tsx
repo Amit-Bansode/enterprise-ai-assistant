@@ -8,6 +8,7 @@ export function ScreenContainer({ children }: PropsWithChildren) {
 
   return (
     <SafeAreaView
+      edges={['left', 'right']}
       style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {children}
     </SafeAreaView>

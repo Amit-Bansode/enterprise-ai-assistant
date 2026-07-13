@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { IconButton, TextInput } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -9,6 +10,7 @@ interface ChatInputProps {
 
 export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [value, setValue] = useState('');
+  const insets = useSafeAreaInsets();
 
   const handleSend = () => {
     const trimmed = value.trim();
@@ -21,7 +23,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 8) }]}>
       <TextInput
         mode="outlined"
         placeholder="Ask me anything..."
@@ -47,7 +49,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 4,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingTop: 8,
   },
   input: {
     flex: 1,
